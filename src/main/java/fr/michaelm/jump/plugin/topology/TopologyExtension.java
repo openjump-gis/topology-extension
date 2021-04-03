@@ -74,7 +74,7 @@ public class TopologyExtension extends Extension {
     }
 
     public String getVersion() {
-        return "0.9.3 (2018-09-12)";
+        return "1.0.0 (2021-04-03)";
     }
 
     public void configure(PlugInContext context) throws Exception {
