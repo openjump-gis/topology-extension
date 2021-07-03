@@ -36,7 +36,6 @@ import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
 import com.vividsolutions.jump.algorithm.VertexHausdorffDistance;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.geom.EnvelopeUtil;
-import com.vividsolutions.jump.geom.LineSegmentUtil;
 import com.vividsolutions.jump.task.DummyTaskMonitor;
 import com.vividsolutions.jump.task.TaskMonitor;
 
@@ -351,7 +350,7 @@ public class InternalMatchedSegmentFinder {
             // save the matched segment
             matchedFeatureSegments.add(querySeg);
             if (createIndicators) {
-                matchedLines.add(LineSegmentUtil.asGeometry(factory, querySeg));
+                matchedLines.add(querySeg.toGeometry(factory));
             }
             
         }

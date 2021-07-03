@@ -33,7 +33,7 @@ public class I18NPlug {
     
     // Use the same locale as the main program
     private static final ResourceBundle I18N_RESOURCE =
-        ResourceBundle.getBundle("fr/michaelm/jump/plugin/topology/topology", new Locale(I18N.getLocale()));
+        ResourceBundle.getBundle("fr/michaelm/jump/plugin/topology/topology", I18N.getLocale());
         
     public static String getI18N(String key) {
         try { return I18N_RESOURCE.getString(key); }

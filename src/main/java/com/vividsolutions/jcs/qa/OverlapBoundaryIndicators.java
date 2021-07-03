@@ -33,9 +33,9 @@
 package com.vividsolutions.jcs.qa;
 
 import com.vividsolutions.jump.algorithm.VertexHausdorffDistance;
-import com.vividsolutions.jump.geom.GeometryFactoryUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.util.LineStringExtracter;
 import org.locationtech.jts.precision.EnhancedPrecisionOp;
 
 import java.util.ArrayList;
@@ -64,14 +64,16 @@ public class OverlapBoundaryIndicators {
     Geometry intersectLines = null;
     try {
       Geometry intersect = EnhancedPrecisionOp.intersection(f0, f1);
-      intersectLines = GeometryFactoryUtil.buildGeometry(intersect, 1);
+      //intersectLines = GeometryFactoryUtil.buildGeometry(intersect, 1);
+      intersectLines = LineStringExtracter.getGeometry(intersect);
     }
     catch (Exception ex) {
       // this should be a TopologyException - can ignore it
     }
 
     Geometry overlapBdy = EnhancedPrecisionOp.intersection(f0, f1.getBoundary());
-    Geometry overlapBdyLines = GeometryFactoryUtil.buildGeometry(overlapBdy, 1);
+    //Geometry overlapBdyLines = GeometryFactoryUtil.buildGeometry(overlapBdy, 1);
+    Geometry overlapBdyLines = LineStringExtracter.getGeometry(overlapBdy);
 
     Geometry indAll;
     if (intersectLines != null) {
@@ -81,7 +83,8 @@ public class OverlapBoundaryIndicators {
       indAll = EnhancedPrecisionOp.difference(overlapBdyLines, f0.getBoundary());
     }
     // return only the lines found
-    Geometry indLines = GeometryFactoryUtil.buildGeometry(indAll, 1);
+    //Geometry indLines = GeometryFactoryUtil.buildGeometry(indAll, 1);
+    Geometry indLines = LineStringExtracter.getGeometry(indAll);
 
     return indLines;
   }

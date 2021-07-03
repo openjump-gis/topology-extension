@@ -32,8 +32,8 @@
 
 package com.vividsolutions.jcs.conflate.boundarymatch;
 
+import org.locationtech.jts.algorithm.distance.DiscreteHausdorffDistance;
 import org.locationtech.jts.geom.*;
-import com.vividsolutions.jump.geom.LineSegmentUtil;
 import com.vividsolutions.jump.geom.*;
 
 /**
@@ -46,6 +46,7 @@ public class SegmentMatcher {
     public static final int SAME_ORIENTATION = 1;
     public static final int OPPOSITE_ORIENTATION = 2;
     public static final int EITHER_ORIENTATION = 3;
+    private static final GeometryFactory FACTORY = new GeometryFactory();
 
     public static boolean isCloseTo(Coordinate coord, LineSegment seg, double tolerance) {
         if (coord.distance(seg.getCoordinate(0)) < tolerance) {
@@ -164,14 +165,14 @@ public class SegmentMatcher {
                 break;
         }
 
-        LineSegment projSeg1 = LineSegmentUtil.project(seg1, seg2);
-        LineSegment projSeg2 = LineSegmentUtil.project(seg2, seg1);
+        LineSegment projSeg1 = seg2.project(seg1);
+        LineSegment projSeg2 = seg1.project(seg2);
         if (projSeg1 == null || projSeg2 == null) {
             isMatch = false;
             return isMatch;
         }
 
-        if (LineSegmentUtil.hausdorffDistance(projSeg1, projSeg2) > distanceTolerance) {
+        if (new DiscreteHausdorffDistance(projSeg1.toGeometry(FACTORY), projSeg2.toGeometry(FACTORY)).distance() > distanceTolerance) {
             isMatch = false;
         }
         return isMatch;

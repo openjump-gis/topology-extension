@@ -38,7 +38,6 @@ import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDatasetFactory;
-import com.vividsolutions.jump.geom.LineSegmentUtil;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.CoordinateArrays;
 import fr.michaelm.jump.plugin.topology.I18NPlug;
@@ -47,7 +46,6 @@ import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -189,7 +187,7 @@ public class MatchedSegmentFinder {
             boolean hasMatch = checkMatches(f, querySeg, candidateSegments);
             if (hasMatch) {
                 // save the matched segment in matchedFC[1]
-                matchedLines[1].add(LineSegmentUtil.asGeometry(factory, querySeg));
+                matchedLines[1].add(querySeg.toGeometry(factory));
             }
         }
     }
@@ -207,7 +205,7 @@ public class MatchedSegmentFinder {
             boolean isEqual = querySeg.equalsTopo(candidateSeg);
             if (isMatch && ! isEqual) {
               // save the matched segment in matchedFC[0]
-              matchedLines[0].add(LineSegmentUtil.asGeometry(factory, candidateSeg));
+              matchedLines[0].add(candidateSeg.toGeometry(factory));
               hasMatch = true;
               // check for relative size of IDs to avoid creating duplicate indicators
               // if (querySeg.getFeature().getID() > candidateFS.getFeature().getID()) {
