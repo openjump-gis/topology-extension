@@ -26,8 +26,6 @@ package fr.michaelm.jump.plugin.topology;
 
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -248,8 +246,8 @@ public class ProjectPointsOnLinesPlugIn extends ThreadedBasePlugIn {
         
         // Create a spatial index containing all the linear components of fc_lines
         STRtree index = new STRtree();
-        for (Object feature : fc_lines.getFeatures()) {
-            GeometryWrapper.createWrapper((Feature)feature, index);
+        for (Feature feature : fc_lines.getFeatures()) {
+            GeometryWrapper.createWrapper(feature, index);
         }
         
         FeatureSchema fs = fc_points.getFeatureSchema().clone();
@@ -262,9 +260,8 @@ public class ProjectPointsOnLinesPlugIn extends ThreadedBasePlugIn {
         VertexSnapper snapper = new MaxLateralDistanceVertexSnapper(tolerance, snap_tolerance);
         //Set<LinearComponent> modifiedComponents = new HashSet<LinearComponent>();
         // Main loop processing each point feature one after the other and
-        Map<Integer,GeometryWrapper> targets = new HashMap<Integer, GeometryWrapper>();
-        for (Object o : fc_points.getFeatures()) {
-            Feature f = (Feature)o;
+        Map<Integer,GeometryWrapper> targets = new HashMap<>();
+        for (Feature f : fc_points.getFeatures()) {
             if (count++%100==0 || count>=tot) {
                 monitor.report(count, tot, POINTS_PROCESSED);
             }
@@ -339,8 +336,8 @@ public class ProjectPointsOnLinesPlugIn extends ThreadedBasePlugIn {
     
     private boolean validPointFC(Component comp, FeatureCollection points) {
         //boolean valid = false;
-        for (Object o : points.getFeatures()) {
-            Geometry g = ((Feature)o).getGeometry();
+        for (Feature f : points.getFeatures()) {
+            Geometry g = f.getGeometry();
             if (g instanceof Point) return true;
         }
         JOptionPane.showMessageDialog(comp, NO_POINT_IN_POINT_LAYER);

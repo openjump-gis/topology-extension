@@ -36,7 +36,6 @@ package com.vividsolutions.jcs.plugin.qa;
 
 import java.awt.Color;
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
 
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.util.feature.*;

@@ -32,7 +32,7 @@
 
 package com.vividsolutions.jcs.qa;
 
-import com.vividsolutions.jump.algorithm.VertexHausdorffDistance;
+import org.locationtech.jts.algorithm.distance.DiscreteHausdorffDistance;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.util.LineStringExtracter;
@@ -129,7 +129,7 @@ public class OverlapBoundaryIndicators {
       if (! ob0.isEmpty() && ! ob1.isEmpty()) {
         // create indicator showing size of maximum overlap
         // assert: ind0 and ind are not null
-        VertexHausdorffDistance hDist = new VertexHausdorffDistance(ob0, ob1);
+        DiscreteHausdorffDistance hDist = new DiscreteHausdorffDistance(ob0, ob1);
         Geometry overlapSizeInd = factory.createLineString(hDist.getCoordinates());
         overlapSizeIndicators.add(overlapSizeInd);
       }

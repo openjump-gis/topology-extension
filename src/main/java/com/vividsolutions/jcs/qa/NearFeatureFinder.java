@@ -114,12 +114,9 @@ public class NearFeatureFinder {
     }*/
 
     /**
-     * Finds the features from the list <code>fList</code>
+     * Finds the features from the list <code>fc</code>
      * which are within <code>maxDist</code>
      * of the envelope of the feature <code>f</code>
-     * @param f
-     * @param fc
-     * @param maxDist
      * @return null or empty list if no near features were found
      */
     public List findNearByEnvelope(Feature f, FeatureCollection fc, double maxDist) {
@@ -132,9 +129,6 @@ public class NearFeatureFinder {
     /**
      *  Finds the features from the list <code>fList</code> which are within <code>maxDist</code>
      * of the feature <code>f</code>
-     * @param f
-     * @param fList
-     * @param maxDist
      * @return null or empty list if no near features were found
      */
     public List findNearByDistance(Feature f, List fList, double maxDist) {

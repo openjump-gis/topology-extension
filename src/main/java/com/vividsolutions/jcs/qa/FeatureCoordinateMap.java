@@ -65,7 +65,7 @@ public class FeatureCoordinateMap {
     }
 
     //private Map coordMap = new TreeMap();
-    private final Map<Coordinate,List<Feature>> coordMap = new HashMap<Coordinate,List<Feature>>();
+    private final Map<Coordinate,List<Feature>> coordMap = new HashMap<>();
     private final TaskMonitor monitor;
     private Envelope fence = null;
 

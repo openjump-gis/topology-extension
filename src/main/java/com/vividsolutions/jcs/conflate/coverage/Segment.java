@@ -101,8 +101,6 @@ public class Segment extends GeometryComponent {
      * @return true if the segment was adjusted
      */
     public boolean addMatchedSegment(Segment matchSeg, double distanceTolerance) {
-        // Debug.println("matching " + matchSeg + "to " + this);
-        // Debug.println(toGeometryCollection(matchSeg.toString(), this.toString()));
         boolean isAdjusted = false;
         isAdjusted |= addMatchedVertex(matchSeg.vertex[0], distanceTolerance);
         isAdjusted |= addMatchedVertex(matchSeg.vertex[1], distanceTolerance);

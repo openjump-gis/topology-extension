@@ -297,8 +297,8 @@ public class NetworkTopologyCleaningPlugIn extends ThreadedBasePlugIn {
         // New layer with snapped features
         FeatureSchema result_fs = fc.getFeatureSchema().clone();
         FeatureCollection result = new FeatureDataset(result_fs);
-        for (Object feature : fc.getFeatures()) {
-            result.add(((Feature)feature).clone(true));
+        for (Feature feature : fc.getFeatures()) {
+            result.add((feature).clone(true));
         }
         
         // Indexed reference feature collection
@@ -312,11 +312,11 @@ public class NetworkTopologyCleaningPlugIn extends ThreadedBasePlugIn {
         
         // List of nodes which are not snapped on a reference vertex
         List<Node> nodes_to_snap = new ArrayList<>();
-        for (Object feature : result.getFeatures()) {
-            Coordinate[] cc = ((Feature)feature).getGeometry().getCoordinates();
-            Node node_ini = new Node(cc[0], 0, (Feature)feature);
+        for (Feature feature : result.getFeatures()) {
+            Coordinate[] cc = (feature).getGeometry().getCoordinates();
+            Node node_ini = new Node(cc[0], 0, feature);
             if (!node_ini.isSnapped(ifc_ref)) nodes_to_snap.add(node_ini);
-            Node node_end = new Node(cc[cc.length-1], cc.length-1, (Feature)feature);
+            Node node_end = new Node(cc[cc.length-1], cc.length-1, feature);
             if (!node_end.isSnapped(ifc_ref)) nodes_to_snap.add(node_end);
         }
         
