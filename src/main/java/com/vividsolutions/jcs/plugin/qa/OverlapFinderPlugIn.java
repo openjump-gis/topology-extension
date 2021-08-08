@@ -33,6 +33,7 @@
 package com.vividsolutions.jcs.plugin.qa;
 
 import com.vividsolutions.jcs.qa.OverlapFinder;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.ColorUtil;
@@ -46,16 +47,17 @@ import com.vividsolutions.jump.workbench.plugin.ThreadedBasePlugIn;
 import com.vividsolutions.jump.workbench.ui.GUIUtil;
 import com.vividsolutions.jump.workbench.ui.MenuNames;
 import com.vividsolutions.jump.workbench.ui.MultiInputDialog;
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 
 import java.awt.*;
 
 public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
 
-  private final static String TOPOLOGY = I18NPlug.getI18N("Topology");
-  private final static String LAYER1 = I18NPlug.getI18N("Layer") + " 1";
-  private final static String LAYER2 = I18NPlug.getI18N("Layer") + " 2";
-  private final static String CREATE_NEW_LAYERS = I18NPlug.getI18N("create-new-layers");
+  private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
+
+  private final static String TOPOLOGY = i18n.get("Topology");
+  private final static String LAYER1 = i18n.get("Layer") + " 1";
+  private final static String LAYER2 = i18n.get("Layer") + " 2";
+  private final static String CREATE_NEW_LAYERS = i18n.get("create-new-layers");
 
   private Layer layer1, layer2;
   private boolean createNewLayers;
@@ -63,18 +65,22 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
   public OverlapFinderPlugIn() { }
 
   public void initialize(PlugInContext context) throws Exception {
-    context.getFeatureInstaller().addMainMenuPlugin(
-          this, new String[]{MenuNames.PLUGINS, TOPOLOGY},
-          I18NPlug.getI18N("qa.OverlapFinderPlugIn.find-overlaps")+"...",
-          false, null, new MultiEnableCheck()
-          .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
-          .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(2)));
+    context.getFeatureInstaller().addMainMenuPlugin(this,
+        new String[]{MenuNames.PLUGINS, TOPOLOGY},
+        getName() + "...", false, null,
+        new MultiEnableCheck()
+            .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
+            .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(2)));
+  }
+
+  public String getName() {
+    return i18n.get("qa.OverlapFinderPlugIn.find-overlaps");
   }
 
   public boolean execute(PlugInContext context) {
     MultiInputDialog dialog = new MultiInputDialog(
         context.getWorkbenchFrame(),
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.find-overlaps"),
+        i18n.get("qa.OverlapFinderPlugIn.find-overlaps"),
         true);
     setDialogValues(dialog, context);
     GUIUtil.centreOnWindow(dialog);
@@ -111,7 +117,7 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
                                   Layer inputLayer,
                                   FeatureCollection overlaps, Color fillColor)
   {
-    String overlapLayerName = I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlaps") +
+    String overlapLayerName = i18n.get("qa.OverlapFinderPlugIn.overlaps") +
         " " + inputLayer.getName();
     Layer lyr;
     if (createNewLayers) {
@@ -125,7 +131,7 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
     lyr.getBasicStyle().setFillColor(fillColor);
     lyr.getBasicStyle().setLineColor(fillColor.darker());
     lyr.fireAppearanceChanged();
-    lyr.setDescription(I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlaps-for") +
+    lyr.setDescription(i18n.get("qa.OverlapFinderPlugIn.overlaps-for") +
         inputLayer.getName());
   }
 
@@ -141,7 +147,7 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
       createOverlapLayer(context, layer2, overlaps2, ColorUtil.PALE_BLUE);
 
       String overlapSegLayerName =
-          I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlap-segments");
+          i18n.get("qa.OverlapFinderPlugIn.overlap-segments");
       Layer lyr2;
       if (createNewLayers) {
         lyr2 = context.addLayer(StandardCategoryNames.QA,
@@ -153,10 +159,10 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
       }
       LayerStyleUtil.setLinearStyle(lyr2, Color.red, 2, 4);
       lyr2.fireAppearanceChanged();
-      lyr2.setDescription(I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlap-segments"));
+      lyr2.setDescription(i18n.get("qa.OverlapFinderPlugIn.overlap-segments"));
 
       String overlapSizeLayerName =
-          I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlap-size");
+          i18n.get("qa.OverlapFinderPlugIn.overlap-size");
       Layer lyr3;
       if (createNewLayers) {
         lyr3 = context.addLayer(StandardCategoryNames.QA,
@@ -169,7 +175,7 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
       LayerStyleUtil.setLinearStyle(lyr3, Color.blue, 2, 4);
       lyr3.fireAppearanceChanged();
       lyr3.setDescription(
-          I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlap-size-indicators"));
+          i18n.get("qa.OverlapFinderPlugIn.overlap-size-indicators"));
 
   }
 
@@ -180,36 +186,36 @@ public class OverlapFinderPlugIn extends ThreadedBasePlugIn {
     {
     context.getOutputFrame().createNewDocument();
     context.getOutputFrame().addHeader(1,
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.overlaps"));
+        i18n.get("qa.OverlapFinderPlugIn.overlaps"));
     context.getOutputFrame().addField(LAYER1 + ": ", layer1.getName() );
     context.getOutputFrame().addField(LAYER2 + ": ", layer2.getName() );
     context.getOutputFrame().addText(" ");
 
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.nb-overlapping-features-in") +
+        i18n.get("qa.OverlapFinderPlugIn.nb-overlapping-features-in") +
         layer1.getName() + ": ", "" + overlaps1.size());
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.nb-overlapping-features-in") +
+        i18n.get("qa.OverlapFinderPlugIn.nb-overlapping-features-in") +
         layer2.getName() + ": ", "" + overlaps2.size());
 
     double[] minMax = FeatureStatistics.minMaxValue(overlapSizeInd, "LENGTH");
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.min-overlap-size"), "" + minMax[0]);
+        i18n.get("qa.OverlapFinderPlugIn.min-overlap-size"), "" + minMax[0]);
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.max-overlap-size"), "" + minMax[1]);
+        i18n.get("qa.OverlapFinderPlugIn.max-overlap-size"), "" + minMax[1]);
 
   }
 
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     //dialog.setSideBarImage(new ImageIcon(getClass().getResource("CoverageOverlap.png")));
     dialog.setSideBarDescription(
-        I18NPlug.getI18N("qa.OverlapFinderPlugIn.find-overlaps-in-two-datasets"));
+        i18n.get("qa.OverlapFinderPlugIn.find-overlaps-in-two-datasets"));
     dialog.addLayerComboBox(LAYER1,
         context.getLayerManager().getLayer(0), null, context.getLayerManager());
     dialog.addLayerComboBox(LAYER2,
         context.getLayerManager().getLayer(1), null, context.getLayerManager());
     dialog.addCheckBox(CREATE_NEW_LAYERS, false,
-        I18NPlug.getI18N("create-new-layers-for-the-output"));
+        i18n.get("create-new-layers-for-the-output"));
   }
 
   private void getDialogValues(MultiInputDialog dialog) {

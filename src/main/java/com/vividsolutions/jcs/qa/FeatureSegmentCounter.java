@@ -34,12 +34,12 @@
 
 package com.vividsolutions.jcs.qa;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.geom.LineSegmentEnvelopeIntersector;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.CoordinateArrays;
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.util.Debug;
 
@@ -56,6 +56,7 @@ import java.util.*;
  */
 public class FeatureSegmentCounter {
 
+    private static final I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
     private static final GeometryFactory factory = new GeometryFactory();
     private static final Integer ONE = 1;
 
@@ -86,13 +87,13 @@ public class FeatureSegmentCounter {
 
     public void add(FeatureCollection fc) {
         monitor.allowCancellationRequests();
-        monitor.report(I18NPlug.getI18N("qa.FeatureSegmentCounter.adding-features-to-counter"));
+        monitor.report(i18n.get("qa.FeatureSegmentCounter.adding-features-to-counter"));
         int totalFeatures = fc.size();
         int j = 0;
         for (Iterator i = fc.iterator(); i.hasNext() && ! monitor.isCancelRequested(); ) {
             Feature feature = (Feature) i.next();
             j++;
-            monitor.report(j, totalFeatures, I18NPlug.getI18N("features"));
+            monitor.report(j, totalFeatures, i18n.get("features"));
             add(feature);
         }
     }

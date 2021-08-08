@@ -31,6 +31,7 @@ import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
 // History
+// 1.1.0 (2021-08-08) : refactoring for new I18N management
 // 1.0.0 (2021-04-03) : clean, generify and refactor for OpenJUMP2
 // 0.9.3 (2018-09-12) : fix a bug in CoverageCleaner
 // 0.9.2 (2018-01-27) : add finnish translations
@@ -74,7 +75,7 @@ public class TopologyExtension extends Extension {
     }
 
     public String getVersion() {
-        return "1.0.0 (2021-04-03)";
+        return "1.1.0 (2021-08-08)";
     }
 
     public void configure(PlugInContext context) throws Exception {

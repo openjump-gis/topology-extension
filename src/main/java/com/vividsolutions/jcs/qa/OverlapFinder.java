@@ -32,9 +32,9 @@
 
 package com.vividsolutions.jcs.qa;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.TaskMonitor;
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.IntersectionMatrix;
@@ -46,8 +46,10 @@ import java.util.*;
  * Finds features which overlap, in one or two datasets.
  */
 public class OverlapFinder {
-    
-  private static final String FEATURES = I18NPlug.getI18N("features");
+
+  private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
+
+  private static final String FEATURES = i18n.get("features");
 
   private final OverlappingFeatures[] overlappingFeatures;
   private final int scanFCIndex;
@@ -128,11 +130,11 @@ public class OverlapFinder {
     monitor.allowCancellationRequests();
 
     FeatureCollection queryFC = getQueryFC(overlappingFeatures[scanFCIndex].inputFC);
-    monitor.report(I18NPlug.getI18N("qa.OverlapFinder.building-feature-index"));
+    monitor.report(i18n.get("qa.OverlapFinder.building-feature-index"));
     FeatureCollection indexFC = new IndexedFeatureCollection(overlappingFeatures[0].inputFC);
     int totalSegments = queryFC.size();
     int count = 0;
-    monitor.report(I18NPlug.getI18N("qa.OverlapFinder.finding-overlaps"));
+    monitor.report(i18n.get("qa.OverlapFinder.finding-overlaps"));
     for (Feature f : queryFC.getFeatures()) {
       monitor.report(++count, totalSegments, FEATURES);
       List<Feature> closeFeat = indexFC.query(f.getGeometry().getEnvelopeInternal());
@@ -197,7 +199,7 @@ public class OverlapFinder {
     }
     // no indicators were computed - print a warning
     System.out.println(
-        I18NPlug.getI18N("qa.OverlapFinder.warning-could-not-compute-overlap-indicators"));
+        i18n.get("qa.OverlapFinder.warning-could-not-compute-overlap-indicators"));
     System.out.println(f0.getGeometry());
     System.out.println(f1.getGeometry());
   }

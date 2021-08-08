@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -61,7 +62,9 @@ import org.locationtech.jts.index.strtree.STRtree;
 // 0.6   (2012-09-17) complete rewrite to be able to do multi-projections
 // 0.1.0 (2012-12-25) initial version
 public class ProjectPointsOnLinesPlugIn extends ThreadedBasePlugIn {
-    
+
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
+
     private static String TOPOLOGY;
     private static String PROJECT_POINTS_ON_LINES;
     
@@ -116,52 +119,55 @@ public class ProjectPointsOnLinesPlugIn extends ThreadedBasePlugIn {
     boolean create_link_layer = false;
     boolean add_dist_attribute = false;
 
+    public String getName() {
+        return i18n.get("ProjectPointsOnLinesPlugIn.project-points-on-lines");
+    }
 
     public void initialize(final PlugInContext context) throws Exception {
         
-        TOPOLOGY                    = I18NPlug.getI18N("Topology");
-        PROJECT_POINTS_ON_LINES     = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.project-points-on-lines");
+        TOPOLOGY                    = i18n.get("Topology");
+        PROJECT_POINTS_ON_LINES     = i18n.get("ProjectPointsOnLinesPlugIn.project-points-on-lines");
                                    
-        POINT_LAYER                 = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.point-layer");
-        POINT_LAYER_TOOLTIP         = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.point-layer-tooltip");
-        TARGET_LAYER                = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.target-layer");
-        TARGET_LAYER_TOOLTIP        = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.target-layer-tooltip");
+        POINT_LAYER                 = i18n.get("ProjectPointsOnLinesPlugIn.point-layer");
+        POINT_LAYER_TOOLTIP         = i18n.get("ProjectPointsOnLinesPlugIn.point-layer-tooltip");
+        TARGET_LAYER                = i18n.get("ProjectPointsOnLinesPlugIn.target-layer");
+        TARGET_LAYER_TOOLTIP        = i18n.get("ProjectPointsOnLinesPlugIn.target-layer-tooltip");
                                    
-        TOLERANCE                   = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.distance-tolerance");
-        TOLERANCE_TOOLTIP           = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.distance-tolerance-tooltip");
-        SNAP                        = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.vertex-snapping");
-        SNAP_TOOLTIP                = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.vertex-snapping-tooltip");
-        SNAP_TOLERANCE              = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.snap-tolerance");
-        SNAP_TOLERANCE_TOOLTIP      = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.snap-tolerance-tooltip");
+        TOLERANCE                   = i18n.get("ProjectPointsOnLinesPlugIn.distance-tolerance");
+        TOLERANCE_TOOLTIP           = i18n.get("ProjectPointsOnLinesPlugIn.distance-tolerance-tooltip");
+        SNAP                        = i18n.get("ProjectPointsOnLinesPlugIn.vertex-snapping");
+        SNAP_TOOLTIP                = i18n.get("ProjectPointsOnLinesPlugIn.vertex-snapping-tooltip");
+        SNAP_TOLERANCE              = i18n.get("ProjectPointsOnLinesPlugIn.snap-tolerance");
+        SNAP_TOLERANCE_TOOLTIP      = i18n.get("ProjectPointsOnLinesPlugIn.snap-tolerance-tooltip");
         
-        PROJECT                     = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.project");
-        PROJECT_TOOLTIP             = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.project-tooltip");
+        PROJECT                     = i18n.get("ProjectPointsOnLinesPlugIn.project");
+        PROJECT_TOOLTIP             = i18n.get("ProjectPointsOnLinesPlugIn.project-tooltip");
         
-        MODIFY_TARGET_LAYER         = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.modify-target-layer");
-        MODIFY_TARGET_LAYER_TOOLTIP = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.modify-target-layer-tooltip");
-        NO_OPERATION                = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.no-operation");
-        INSERT                      = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.insert");
-        SPLIT                       = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.split");
+        MODIFY_TARGET_LAYER         = i18n.get("ProjectPointsOnLinesPlugIn.modify-target-layer");
+        MODIFY_TARGET_LAYER_TOOLTIP = i18n.get("ProjectPointsOnLinesPlugIn.modify-target-layer-tooltip");
+        NO_OPERATION                = i18n.get("ProjectPointsOnLinesPlugIn.no-operation");
+        INSERT                      = i18n.get("ProjectPointsOnLinesPlugIn.insert");
+        SPLIT                       = i18n.get("ProjectPointsOnLinesPlugIn.split");
         
-        NEAREST_PROJ_ONLY           = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.nearest-proj-only");
-        ALL_PROJ_WITHIN_TOLERANCE   = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.all-proj-within-tolerance");  
+        NEAREST_PROJ_ONLY           = i18n.get("ProjectPointsOnLinesPlugIn.nearest-proj-only");
+        ALL_PROJ_WITHIN_TOLERANCE   = i18n.get("ProjectPointsOnLinesPlugIn.all-proj-within-tolerance");
         
-        CREATE_LINK_LAYER           = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.create-link-layer");
-        CREATE_LINK_LAYER_TOOLTIP   = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.create-link-layer-tooltip");
-        PROJECTED_DISTANCE          = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.projected-distance");
-        PROJECTED                   = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.projected");
-        LINKS                       = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.links");
+        CREATE_LINK_LAYER           = i18n.get("ProjectPointsOnLinesPlugIn.create-link-layer");
+        CREATE_LINK_LAYER_TOOLTIP   = i18n.get("ProjectPointsOnLinesPlugIn.create-link-layer-tooltip");
+        PROJECTED_DISTANCE          = i18n.get("ProjectPointsOnLinesPlugIn.projected-distance");
+        PROJECTED                   = i18n.get("ProjectPointsOnLinesPlugIn.projected");
+        LINKS                       = i18n.get("ProjectPointsOnLinesPlugIn.links");
         
-        POINTS_PROCESSED            = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.points-processed");
-        NO_POINT_IN_POINT_LAYER     = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.no-point-in-point-layer");
-        NO_FEATURE_IN_TARGET_LAYER  = I18NPlug.getI18N("ProjectPointsOnLinesPlugIn.no-feature-in-target-layer");
+        POINTS_PROCESSED            = i18n.get("ProjectPointsOnLinesPlugIn.points-processed");
+        NO_POINT_IN_POINT_LAYER     = i18n.get("ProjectPointsOnLinesPlugIn.no-point-in-point-layer");
+        NO_FEATURE_IN_TARGET_LAYER  = i18n.get("ProjectPointsOnLinesPlugIn.no-feature-in-target-layer");
         
-        context.getFeatureInstaller().addMainMenuPlugin(
-          this, new String[]{MenuNames.PLUGINS, TOPOLOGY},
-          PROJECT_POINTS_ON_LINES + "...",
-          false, null, new MultiEnableCheck()
-          .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
-          .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(2)));
+        context.getFeatureInstaller().addMainMenuPlugin(this,
+            new String[]{MenuNames.PLUGINS, TOPOLOGY},
+            getName() + "...", false, null,
+            new MultiEnableCheck()
+                .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
+                .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(2)));
     }
     
     public boolean execute(PlugInContext context) {

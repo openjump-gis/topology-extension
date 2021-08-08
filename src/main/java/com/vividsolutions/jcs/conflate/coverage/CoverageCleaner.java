@@ -35,10 +35,9 @@ package com.vividsolutions.jcs.conflate.coverage;
 
 import com.vividsolutions.jcs.qa.*;
 import com.vividsolutions.jcs.conflate.boundarymatch.*;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.*;
-
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 
 import java.util.*;
 
@@ -51,6 +50,8 @@ import org.locationtech.jts.util.Debug;
  * coverage topology.
  */
 public class CoverageCleaner {
+
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
   
     public static boolean hasMultiPolygonFeature(List<Feature> featureList) {
         for (Feature feature : featureList) {
@@ -128,7 +129,7 @@ public class CoverageCleaner {
 
     public void process(Parameters param) {
         this.param = param;
-        monitor.report(I18NPlug.getI18N("qa.CoverageCleaner.matching-segments"));
+        monitor.report(i18n.get("qa.CoverageCleaner.matching-segments"));
 
         if (monitor.isCancelRequested()) return;
         // Find matching FeatureSegments (intersecting fence if fence is not null)
@@ -234,24 +235,21 @@ public class CoverageCleaner {
      */
     private void adjustNearFeatures(FeatureCollection matchedFC, FeatureCollection adjustableFC) {
         
-        monitor.report(I18NPlug.getI18N("qa.CoverageCleaner.adjusting-features"));
+        monitor.report(i18n.get("qa.CoverageCleaner.adjusting-features"));
         
         SegmentMatcher segmentMatcher =
             new SegmentMatcher(param.distanceTolerance, param.angleTolerance);
         
         // Only index the features which have potential matches
         NearFeatureFinder nff = new NearFeatureFinder(adjustableFC);
-        
-        /**
-         * MD - can we get away with only comparing matched features?
-         * This would be faster, since fewer features are in the index.
-         * (MD - actually doesn't appear to make much overall speed difference)
-         * However, it may cause problems with coverage consistency
-         * (non-matched features may still share vertices which are adjusted, and
-         * thus must be adjusted themselves)
-         */
-        //NearFeatureFinder nff = new NearFeatureFinder(matchedFC);
-        
+
+        // MD - can we get away with only comparing matched features?
+        // This would be faster, since fewer features are in the index.
+        // (MD - actually doesn't appear to make much overall speed difference)
+        // However, it may cause problems with coverage consistency
+        // (non-matched features may still share vertices which are adjusted, and
+        // thus must be adjusted themselves)
+
         int featuresProcessed = 0;
         int totalFeatures = matchedFC.size();
         //long t0 = System.currentTimeMillis();
@@ -261,7 +259,7 @@ public class CoverageCleaner {
             featuresProcessed++;
             // currently only polygons are handled
             if (!(f.getGeometry() instanceof Polygon)) continue;
-            monitor.report(featuresProcessed, totalFeatures, I18NPlug.getI18N("features"));
+            monitor.report(featuresProcessed, totalFeatures, i18n.get("features"));
             
             List<Feature> nearFeatures = nff.findNearFeatures(f, param.distanceTolerance);
             // currently only polygons are handled

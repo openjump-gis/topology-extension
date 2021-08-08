@@ -37,6 +37,7 @@ package com.vividsolutions.jcs.plugin.qa;
 import java.awt.Color;
 import javax.swing.ImageIcon;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.util.feature.*;
 import com.vividsolutions.jcs.qa.*;
@@ -45,21 +46,22 @@ import com.vividsolutions.jump.workbench.model.*;
 import com.vividsolutions.jump.workbench.plugin.*;
 import com.vividsolutions.jump.workbench.ui.*;
 
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 
 public class CoverageGapPlugIn extends ThreadedBasePlugIn {
 
-  private final static String TOPOLOGY = I18NPlug.getI18N("Topology");
-  public final static String GAP_SEGMENT_LAYER_NAME =
-      I18NPlug.getI18N("qa.CoverageGapPlugIn.gap-segment");
-  public final static String GAP_SIZE_LAYER_NAME =
-      I18NPlug.getI18N("qa.CoverageGapPlugIn.gap-size");
+  private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
 
-  private final static String LAYER = I18NPlug.getI18N("Layer");
-  private final static String DIST_TOL = I18NPlug.getI18N("dist-tolerance");
-  private final static String ANGLE_TOL = I18NPlug.getI18N("angle-tolerance");
-  private final static String CREATE_NEW_LAYERS = I18NPlug.getI18N("create-new-layers");
-  private final static String USE_FENCE = I18NPlug.getI18N("use-fence");
+  private final static String TOPOLOGY = i18n.get("Topology");
+  public final static String GAP_SEGMENT_LAYER_NAME =
+      i18n.get("qa.CoverageGapPlugIn.gap-segment");
+  public final static String GAP_SIZE_LAYER_NAME =
+      i18n.get("qa.CoverageGapPlugIn.gap-size");
+
+  private final static String LAYER = i18n.get("Layer");
+  private final static String DIST_TOL = i18n.get("dist-tolerance");
+  private final static String ANGLE_TOL = i18n.get("angle-tolerance");
+  private final static String CREATE_NEW_LAYERS = i18n.get("create-new-layers");
+  private final static String USE_FENCE = i18n.get("use-fence");
 
   private Layer layer;
   private final InternalMatchedSegmentFinder.Parameters param
@@ -70,18 +72,22 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
   public CoverageGapPlugIn() { }
 
   public void initialize(PlugInContext context) throws Exception {
-    context.getFeatureInstaller().addMainMenuPlugin(
-          this, new String[]{MenuNames.PLUGINS, TOPOLOGY},
-          I18NPlug.getI18N("qa.CoverageGapPlugIn.find-coverage-gaps")+"...",
-          false, null, new MultiEnableCheck()
-          .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
-          .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
+    context.getFeatureInstaller().addMainMenuPlugin(this,
+        new String[]{MenuNames.PLUGINS, TOPOLOGY},
+        getName() + "...", false, null,
+        new MultiEnableCheck()
+            .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
+            .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
+  }
+
+  public String getName() {
+    return i18n.get("qa.CoverageGapPlugIn.find-coverage-gaps");
   }
 
   public boolean execute(PlugInContext context) {
     MultiInputDialog dialog = new MultiInputDialog(
         context.getWorkbenchFrame(),
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.find-coverage-gaps"),
+        i18n.get("qa.CoverageGapPlugIn.find-coverage-gaps"),
         true);
     setDialogValues(dialog, context);
     GUIUtil.centreOnWindow(dialog);
@@ -94,7 +100,7 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
   public void run(TaskMonitor monitor, PlugInContext context) {
     monitor.allowCancellationRequests();
 
-    monitor.report(I18NPlug.getI18N("qa.CoverageGapPlugIn.finding-gaps")+"...");
+    monitor.report(i18n.get("qa.CoverageGapPlugIn.finding-gaps")+"...");
     computeMatchedSegments(monitor, context);
     if (monitor.isCancelRequested()) return;
   }
@@ -104,7 +110,7 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
         layer.getFeatureCollectionWrapper(), param, monitor);
     if (useFence) {
       if (context.getLayerViewPanel().getFence() == null) {
-        context.getWorkbenchFrame().warnUser(I18NPlug.getI18N("no-fence-defined"));
+        context.getWorkbenchFrame().warnUser(i18n.get("no-fence-defined"));
         return;
       }
       msf.setFence(context.getLayerViewPanel().getFence());
@@ -130,7 +136,7 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
       lyr.setFeatureCollection(segs);
     }
     lyr.fireAppearanceChanged();
-    lyr.setDescription(I18NPlug.getI18N("qa.CoverageGapPlugIn.gap-segment-indicator") +
+    lyr.setDescription(i18n.get("qa.CoverageGapPlugIn.gap-segment-indicator") +
                            " (" + DIST_TOL + " = " + param.distanceTolerance + ")");
 
     Layer lyr2 = null;
@@ -149,7 +155,7 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
       lyr2.setFeatureCollection(sizeInd);
     }
     lyr2.fireAppearanceChanged();
-    lyr2.setDescription(I18NPlug.getI18N("qa.CoverageGapPlugIn.gap-size-indicator") +
+    lyr2.setDescription(i18n.get("qa.CoverageGapPlugIn.gap-size-indicator") +
                            " (" + DIST_TOL + " = " + param.distanceTolerance + ")");
 
     createdOutput(context, segs, sizeInd);
@@ -161,25 +167,25 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
   {
     context.getOutputFrame().createNewDocument();
     context.getOutputFrame().addHeader(1,
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.coverage-gap"));
+        i18n.get("qa.CoverageGapPlugIn.coverage-gap"));
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("Layer") + ": ", layer.getName() );
+        i18n.get("Layer") + ": ", layer.getName() );
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("dist-tolerance") + ": ", "" + param.distanceTolerance);
+        i18n.get("dist-tolerance") + ": ", "" + param.distanceTolerance);
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("dist-tolerance") + ": ", "" + param.angleTolerance);
+        i18n.get("dist-tolerance") + ": ", "" + param.angleTolerance);
     context.getOutputFrame().addText(" ");
 
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.nb-matched-segments") + ": ", "" + segs.size());
+        i18n.get("qa.CoverageGapPlugIn.nb-matched-segments") + ": ", "" + segs.size());
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.nb-coverage-gaps") + ": ", "" + sizeInd.size());
+        i18n.get("qa.CoverageGapPlugIn.nb-coverage-gaps") + ": ", "" + sizeInd.size());
 
     double[] minMax = FeatureStatistics.minMaxValue(sizeInd, "LENGTH");
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.min-gap-size"), "" + minMax[0]);
+        i18n.get("qa.CoverageGapPlugIn.min-gap-size"), "" + minMax[0]);
     context.getOutputFrame().addField(
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.max-gap-size"), "" + minMax[1]);
+        i18n.get("qa.CoverageGapPlugIn.max-gap-size"), "" + minMax[1]);
 
   }
 
@@ -187,16 +193,16 @@ public class CoverageGapPlugIn extends ThreadedBasePlugIn {
   private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
     dialog.setSideBarImage(new ImageIcon(getClass().getResource("CoverageGap.png")));
     dialog.setSideBarDescription(
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.find-gaps-and-slivers"));
+        i18n.get("qa.CoverageGapPlugIn.find-gaps-and-slivers"));
     dialog.addLayerComboBox(LAYER, context.getCandidateLayer(0), null, context.getLayerManager());
-    dialog.addDoubleField(DIST_TOL, param.distanceTolerance, 8, 
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.dist-tolerance-tooltip"));
+    dialog.addDoubleField(DIST_TOL, param.distanceTolerance, 8,
+        i18n.get("qa.CoverageGapPlugIn.dist-tolerance-tooltip"));
     dialog.addDoubleField(ANGLE_TOL, param.angleTolerance, 8,
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.angle-tolerance-tooltip"));
+        i18n.get("qa.CoverageGapPlugIn.angle-tolerance-tooltip"));
     dialog.addCheckBox(CREATE_NEW_LAYERS, false,
-        I18NPlug.getI18N("create-new-layers-for-the-output"));
-    dialog.addCheckBox(USE_FENCE, false, 
-        I18NPlug.getI18N("qa.CoverageGapPlugIn.process-segments-in-fence-only"));
+        i18n.get("create-new-layers-for-the-output"));
+    dialog.addCheckBox(USE_FENCE, false,
+        i18n.get("qa.CoverageGapPlugIn.process-segments-in-fence-only"));
   }
 
   private void getDialogValues(MultiInputDialog dialog) {

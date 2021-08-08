@@ -35,12 +35,12 @@
 package com.vividsolutions.jcs.qa;
 
 import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.util.CoordinateArrays;
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -58,6 +58,7 @@ import java.util.List;
  */
 public class MatchedSegmentFinder {
 
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
 
     public static class Parameters {
         /**
@@ -76,7 +77,7 @@ public class MatchedSegmentFinder {
     }
 
     private static final GeometryFactory factory = new GeometryFactory();
-    private static final String FEATURES = I18NPlug.getI18N("features");
+    private static final String FEATURES = i18n.get("features");
     
     private final FeatureCollection[] inputFC = new FeatureCollection[2];
     private final FeatureCollection[] matchedFC = new FeatureCollection[2];
@@ -126,9 +127,9 @@ public class MatchedSegmentFinder {
         if (isComputed) return;
         isComputed = true;
 
-        monitor.report(I18NPlug.getI18N("qa.MatchedSegmentFinder.creating-segment-index") + "...");
+        monitor.report(i18n.get("qa.MatchedSegmentFinder.creating-segment-index") + "...");
         createIndex(inputFC[0]);
-        monitor.report(I18NPlug.getI18N("qa.MatchedSegmentFinder.testing-segments") + "...");
+        monitor.report(i18n.get("qa.MatchedSegmentFinder.testing-segments") + "...");
         findMatches(inputFC[1]);
         matchedFC[0] = FeatureDatasetFactory.createFromGeometry(matchedLines[0]);
         matchedFC[1] = FeatureDatasetFactory.createFromGeometry(matchedLines[1]);

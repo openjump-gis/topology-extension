@@ -36,6 +36,7 @@ import java.awt.Color;
 import javax.swing.*;
 
 import com.vividsolutions.jcs.conflate.coverage.CoverageCleaner;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.util.feature.FeatureStatistics;
 import com.vividsolutions.jump.workbench.model.*;
 import com.vividsolutions.jump.workbench.plugin.*;
@@ -47,24 +48,24 @@ import com.vividsolutions.jump.feature.FeatureDataset;
 import com.vividsolutions.jump.task.*;
 import com.vividsolutions.jump.workbench.ui.*;
 
-import fr.michaelm.jump.plugin.topology.I18NPlug;
-
 import org.locationtech.jts.geom.Geometry;
 
 
 public class CoverageCleanerPlugIn extends ThreadedBasePlugIn {
 
-    private final static String TOPOLOGY         = I18NPlug.getI18N("Topology");
-    private final static String LAYER            = I18NPlug.getI18N("Layer");
-    private final static String EXPLODE          = I18NPlug.getI18N("qa.CoverageCleanerPlugIn.explode-first");
-    private final static String NORMALIZE        = I18NPlug.getI18N("qa.CoverageCleanerPlugIn.normalize-first");
-    private final static String DIST_TOL         = I18NPlug.getI18N("dist-tolerance");
-    private final static String ANGLE_TOL        = I18NPlug.getI18N("angle-tolerance");
-    private final static String USE_FENCE        = I18NPlug.getI18N("use-fence");
-    private final static String INTERPOLATE_Z    = I18NPlug.getI18N("qa.CoverageCleanerPlugIn.interpolate-z");
-    private final static String INTERPOLATE_Z_TT = I18NPlug.getI18N("qa.CoverageCleanerPlugIn.interpolate-z-tooltip");
-    private final static String Z_PRECISION      = I18NPlug.getI18N("qa.CoverageCleanerPlugIn.z-precision");
-    private final static String Z_PRECISION_TT   = I18NPlug.getI18N("qa.CoverageCleanerPlugIn.z-precision-tooltip");
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
+
+    private final static String TOPOLOGY         = i18n.get("Topology");
+    private final static String LAYER            = i18n.get("Layer");
+    private final static String EXPLODE          = i18n.get("qa.CoverageCleanerPlugIn.explode-first");
+    private final static String NORMALIZE        = i18n.get("qa.CoverageCleanerPlugIn.normalize-first");
+    private final static String DIST_TOL         = i18n.get("dist-tolerance");
+    private final static String ANGLE_TOL        = i18n.get("angle-tolerance");
+    private final static String USE_FENCE        = i18n.get("use-fence");
+    private final static String INTERPOLATE_Z    = i18n.get("qa.CoverageCleanerPlugIn.interpolate-z");
+    private final static String INTERPOLATE_Z_TT = i18n.get("qa.CoverageCleanerPlugIn.interpolate-z-tooltip");
+    private final static String Z_PRECISION      = i18n.get("qa.CoverageCleanerPlugIn.z-precision");
+    private final static String Z_PRECISION_TT   = i18n.get("qa.CoverageCleanerPlugIn.z-precision-tooltip");
 
     private Layer layer;
     private final CoverageCleaner.Parameters param = new CoverageCleaner.Parameters();
@@ -80,22 +81,22 @@ public class CoverageCleanerPlugIn extends ThreadedBasePlugIn {
      * @return the name of this task
      */
     public String getName() {
-        return I18NPlug.getI18N("qa.CoverageCleanerPlugIn.coverage-cleaner");
+        return i18n.get("qa.CoverageCleanerPlugIn.coverage-cleaner");
     }
 
     public void initialize(PlugInContext context) throws Exception {
-        context.getFeatureInstaller().addMainMenuPlugin(
-                this, new String[]{MenuNames.PLUGINS, TOPOLOGY},
-                I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjust-polygon-boundaries") + "...",
-                false, null, new MultiEnableCheck()
-                        .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
-                        .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
+        context.getFeatureInstaller().addMainMenuPlugin(this,
+            new String[]{MenuNames.PLUGINS, TOPOLOGY},
+            getName() + "...", false, null,
+            new MultiEnableCheck()
+                .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
+                .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
     }
 
     public boolean execute(PlugInContext context) throws Exception {
         MultiInputDialog dialog = new MultiInputDialog(
             context.getWorkbenchFrame(),
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjust-polygon-boundaries"),
+            i18n.get("qa.CoverageCleanerPlugIn.adjust-polygon-boundaries"),
             true);
         setDialogValues(dialog, context);
         GUIUtil.centreOnWindow(dialog);
@@ -116,12 +117,12 @@ public class CoverageCleanerPlugIn extends ThreadedBasePlugIn {
         if (useFence) {
             if (context.getLayerViewPanel().getFence() == null) {
               context.getWorkbenchFrame().warnUser(
-                  I18NPlug.getI18N("no-fence-defined"));
+                  i18n.get("no-fence-defined"));
               return;
             }
             cleaner.setFence(context.getLayerViewPanel().getFence());
         }
-        monitor.report(I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjusting") + "...");
+        monitor.report(i18n.get("qa.CoverageCleanerPlugIn.adjusting") + "...");
         cleaner.process(param);
         if (monitor.isCancelRequested()) return;
         createLayers(context, cleaner);
@@ -136,24 +137,24 @@ public class CoverageCleanerPlugIn extends ThreadedBasePlugIn {
         FeatureCollection adjustedFC = cleaner.getAdjustedFeatures();
         Layer lyr = context.addLayer(
             StandardCategoryNames.QA,
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjusted") + "-" + layer.getName(),
+            i18n.get("qa.CoverageCleanerPlugIn.adjusted") + "-" + layer.getName(),
             adjustedFC);
         lyr.setDescription(
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjusted-features-for") +
+            i18n.get("qa.CoverageCleanerPlugIn.adjusted-features-for") +
             " " + layer.getName() + " (" +
-            I18NPlug.getI18N("dist-tolerance") + " = " + param.distanceTolerance + ")");
+                i18n.get("dist-tolerance") + " = " + param.distanceTolerance + ")");
 
         FeatureCollection adjustmentIndFC = cleaner.getAdjustmentIndicators();
         Layer lyr2 = context.addLayer(
             StandardCategoryNames.QA,
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjustements") + "-" + layer.getName(),
+            i18n.get("qa.CoverageCleanerPlugIn.adjustements") + "-" + layer.getName(),
             adjustmentIndFC);
         LayerStyleUtil.setLinearStyle(lyr2, Color.blue, 2, 4);
         lyr2.fireAppearanceChanged();
         lyr2.setDescription(
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjustement-size-indicator-for") + " " +
+            i18n.get("qa.CoverageCleanerPlugIn.adjustement-size-indicator-for") + " " +
             layer.getName() + " (" +
-            I18NPlug.getI18N("dist-tolerance") + " = " + param.distanceTolerance + ")");
+                i18n.get("dist-tolerance") + " = " + param.distanceTolerance + ")");
 
         createOutput(context, adjustedFC, adjustmentIndFC);
 
@@ -164,40 +165,40 @@ public class CoverageCleanerPlugIn extends ThreadedBasePlugIn {
                               FeatureCollection adjustmentIndFC) {
         context.getOutputFrame().createNewDocument();
         context.getOutputFrame().addHeader(1,
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.coverage-cleaner"));
-        context.getOutputFrame().addField(I18NPlug.getI18N("Layer") + ": ", layer.getName() );
-        context.getOutputFrame().addField(I18NPlug.getI18N("dist-tolerance") + ": ", "" + param.distanceTolerance);
-        context.getOutputFrame().addField(I18NPlug.getI18N("angle-tolerance") + ": ", "" + param.angleTolerance);
+            i18n.get("qa.CoverageCleanerPlugIn.coverage-cleaner"));
+        context.getOutputFrame().addField(i18n.get("Layer") + ": ", layer.getName() );
+        context.getOutputFrame().addField(i18n.get("dist-tolerance") + ": ", "" + param.distanceTolerance);
+        context.getOutputFrame().addField(i18n.get("angle-tolerance") + ": ", "" + param.angleTolerance);
         
         context.getOutputFrame().addHeader(2,
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.adjustements"));
+            i18n.get("qa.CoverageCleanerPlugIn.adjustements"));
         context.getOutputFrame().addField(
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.number-of-features-adjusted"), "" + adjustedFC.size());
+            i18n.get("qa.CoverageCleanerPlugIn.number-of-features-adjusted"), "" + adjustedFC.size());
         context.getOutputFrame().addField(
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.number-of-vertices-adjusted"), "" + adjustmentIndFC.size());
+            i18n.get("qa.CoverageCleanerPlugIn.number-of-vertices-adjusted"), "" + adjustmentIndFC.size());
         
         double[] minMax = FeatureStatistics.minMaxValue(adjustmentIndFC, "LENGTH");
         context.getOutputFrame().addField(
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.min-adjustment-size"), "" + minMax[0]);
+            i18n.get("qa.CoverageCleanerPlugIn.min-adjustment-size"), "" + minMax[0]);
         context.getOutputFrame().addField(
-            I18NPlug.getI18N("qa.CoverageCleanerPlugIn.max-adjustment-size"), "" + minMax[1]);
+            i18n.get("qa.CoverageCleanerPlugIn.max-adjustment-size"), "" + minMax[1]);
     }
 
     private void setDialogValues(MultiInputDialog dialog, PlugInContext context) {
       dialog.setSideBarDescription(
-          I18NPlug.getI18N("qa.CoverageCleanerPlugIn.description")
+          i18n.get("qa.CoverageCleanerPlugIn.description")
       );
       String fieldName = LAYER;
       JComboBox addLayerComboBox = dialog.addLayerComboBox(fieldName,
           context.getCandidateLayer(0), null, context.getLayerManager());
       dialog.addCheckBox(EXPLODE, explode,
-          I18NPlug.getI18N("qa.CoverageCleanerPlugIn.explode-first-definition"));
+          i18n.get("qa.CoverageCleanerPlugIn.explode-first-definition"));
       dialog.addCheckBox(NORMALIZE, normalize,
-          I18NPlug.getI18N("qa.CoverageCleanerPlugIn.normalize-first-definition"));
+          i18n.get("qa.CoverageCleanerPlugIn.normalize-first-definition"));
       dialog.addDoubleField(DIST_TOL, param.distanceTolerance, 8,
-          I18NPlug.getI18N("qa.CoverageCleanerPlugIn.dist-tolerance-definition"));
+          i18n.get("qa.CoverageCleanerPlugIn.dist-tolerance-definition"));
       dialog.addDoubleField(ANGLE_TOL, param.angleTolerance, 4,
-          I18NPlug.getI18N("qa.CoverageCleanerPlugIn.angle-tolerance-definition"));
+          i18n.get("qa.CoverageCleanerPlugIn.angle-tolerance-definition"));
 
       dialog.addSeparator();
 
@@ -207,7 +208,7 @@ public class CoverageCleanerPlugIn extends ThreadedBasePlugIn {
       dialog.addSeparator();
 
       dialog.addCheckBox(USE_FENCE, useFence,
-                I18NPlug.getI18N("qa.CoverageCleanerPlugIn.process-segments-in-fence-only"));
+          i18n.get("qa.CoverageCleanerPlugIn.process-segments-in-fence-only"));
 
       zPrecisionTF.setEnabled(interpolateZCB.isSelected());
       interpolateZCB.addActionListener(e -> zPrecisionTF.setEnabled(interpolateZCB.isSelected()));

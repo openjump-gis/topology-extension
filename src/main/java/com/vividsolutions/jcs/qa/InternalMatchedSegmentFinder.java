@@ -33,13 +33,12 @@
 package com.vividsolutions.jcs.qa;
 
 import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.algorithm.VertexHausdorffDistance;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.geom.EnvelopeUtil;
 import com.vividsolutions.jump.task.DummyTaskMonitor;
 import com.vividsolutions.jump.task.TaskMonitor;
-
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.SpatialIndex;
@@ -60,6 +59,8 @@ import java.util.*;
  * paired are of interest.
  */
 public class InternalMatchedSegmentFinder {
+
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
 
     public Parameters getParam() {
         return param;
@@ -303,26 +304,28 @@ public class InternalMatchedSegmentFinder {
      */
     private void createIndex(Collection<FeatureSegment> fsList) {
         monitor.allowCancellationRequests();
-        monitor.report(I18NPlug.getI18N("qa.InternalMatchedSegmentFinder.creating-segment-index"));
+        monitor.report(i18n.get("qa.InternalMatchedSegmentFinder.creating-segment-index"));
         int totalSegments = fsList.size();
         int count = 0;
         for (FeatureSegment fs : fsList) {
             // ignore zero-length segments
             if (fs.p0.equals(fs.p1)) continue;
             itemEnv.init(fs.p0, fs.p1);
-            monitor.report(++count, totalSegments, I18NPlug.getI18N("qa.InternalMatchedSegmentFinder.segments"));
+            monitor.report(++count, totalSegments,
+                i18n.get("qa.InternalMatchedSegmentFinder.segments"));
             featureSegmentIndex.insert(new Envelope(itemEnv), fs);
         }
     }
 
     private void findMatches(List<FeatureSegment> queryFSList) {
         monitor.allowCancellationRequests();
-        monitor.report(I18NPlug.getI18N("qa.InternalMatchedSegmentFinder.finding-segment-matches"));
+        monitor.report(i18n.get("qa.InternalMatchedSegmentFinder.finding-segment-matches"));
         int totalSegments = queryFSList.size();
         for (int i = 0; i < totalSegments && !monitor.isCancelRequested(); i++) {
             FeatureSegment fs = queryFSList.get(i);
             findMatches(fs);
-            monitor.report(i+1, totalSegments, I18NPlug.getI18N("qa.InternalMatchedSegmentFinder.segments"));
+            monitor.report(i+1, totalSegments,
+                i18n.get("qa.InternalMatchedSegmentFinder.segments"));
         }
     }
 

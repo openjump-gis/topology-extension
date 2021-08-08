@@ -32,13 +32,13 @@
 
 package com.vividsolutions.jcs.qa;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
 import com.vividsolutions.jump.feature.FeatureDatasetFactory;
 import com.vividsolutions.jump.feature.IndexedFeatureCollection;
 import com.vividsolutions.jump.geom.EnvelopeUtil;
 import com.vividsolutions.jump.task.TaskMonitor;
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -52,6 +52,8 @@ import java.util.List;
  * Finds vertices which are close but not equal, in one or two datasets.
  */
 public class CloseVertexFinder {
+
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
 
     private final GeometryFactory geomFactory = new GeometryFactory();
 
@@ -78,14 +80,14 @@ public class CloseVertexFinder {
         monitor.allowCancellationRequests();
 
         FeatureCollection queryFC = inputFC[0];
-        monitor.report(I18NPlug.getI18N("qa.CloseVertexFinder.building-feature-index"));
+        monitor.report(i18n.get("qa.CloseVertexFinder.building-feature-index"));
         FeatureCollection indexFC = new IndexedFeatureCollection(inputFC[1]);
         int totalSegments = queryFC.size();
         int count = 0;
-        monitor.report(I18NPlug.getI18N("qa.CloseVertexFinder.finding-near-vertices"));
+        monitor.report(i18n.get("qa.CloseVertexFinder.finding-near-vertices"));
         for (Iterator i = queryFC.iterator(); i.hasNext(); ) {
         
-            monitor.report(++count, totalSegments, I18NPlug.getI18N("features"));
+            monitor.report(++count, totalSegments, i18n.get("features"));
             
             Feature queryFeat = (Feature) i.next();
             Envelope queryEnv = EnvelopeUtil.expand(queryFeat.getGeometry().getEnvelopeInternal(), distanceTolerance);

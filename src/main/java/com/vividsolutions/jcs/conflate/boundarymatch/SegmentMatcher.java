@@ -49,13 +49,8 @@ public class SegmentMatcher {
     private static final GeometryFactory FACTORY = new GeometryFactory();
 
     public static boolean isCloseTo(Coordinate coord, LineSegment seg, double tolerance) {
-        if (coord.distance(seg.getCoordinate(0)) < tolerance) {
-            return true;
-        }
-        if (coord.distance(seg.getCoordinate(1)) < tolerance) {
-            return true;
-        }
-        return false;
+        return coord.distance(seg.getCoordinate(0)) < tolerance ||
+            coord.distance(seg.getCoordinate(1)) < tolerance;
     }
 
 
@@ -84,7 +79,7 @@ public class SegmentMatcher {
     public static double angleDiff(LineSegment seg0, LineSegment seg1) {
         double a0 = normalizedAngle(seg0.angle());
         double a1 = normalizedAngle(seg1.angle());
-        double delta = Math.min(normalizedAngle(a0 - a1), normalizedAngle(a1-a0));
+        double delta = Math.min(normalizedAngle(a0-a1), normalizedAngle(a1-a0));
         return delta;
     }
 

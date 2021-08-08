@@ -34,9 +34,9 @@
 
 package com.vividsolutions.jcs.qa;
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.TaskMonitor;
-import fr.michaelm.jump.plugin.topology.I18NPlug;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.IntersectionMatrix;
@@ -49,8 +49,9 @@ import java.util.*;
  */
 public class InternalOverlapFinder {
 
+  private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
 
-  private static final String FEATURES = I18NPlug.getI18N("features");
+  private static final String FEATURES = i18n.get("features");
   
   private final FeatureCollection inputFC;
   private FeatureCollection overlappingFC;

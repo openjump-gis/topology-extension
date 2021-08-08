@@ -25,6 +25,7 @@
 package fr.michaelm.jump.plugin.topology;
 
 
+import com.vividsolutions.jump.I18N;
 import com.vividsolutions.jump.feature.*;
 import com.vividsolutions.jump.task.TaskMonitor;
 import com.vividsolutions.jump.workbench.model.Layer;
@@ -62,6 +63,8 @@ import java.util.List;
 // 0.3.3 (2012-11-23) compiled with java 5 
 // 0.3.2 (2011-11-08)
 public class NetworkTopologyCleaningPlugIn extends ThreadedBasePlugIn {
+
+    private final static I18N i18n = I18N.getInstance("fr.michaelm.jump.plugin.topology");
     
     private static String TOPOLOGY;
     private static String NETWORK_TOPOLOGY_CLEANING;
@@ -121,57 +124,59 @@ public class NetworkTopologyCleaningPlugIn extends ThreadedBasePlugIn {
     
     GeometryFactory gf = new GeometryFactory();
     
-    public String getName() {return "Network topology cleaning PlugIn";}
+    public String getName() {
+        return i18n.get("NetworkTopologyCleaningPlugIn.network-topology-cleaning");
+    }
     
     public void initialize(final PlugInContext context) throws Exception {
         
-        TOPOLOGY                   = I18NPlug.getI18N("Topology");
-        NETWORK_TOPOLOGY_CLEANING  = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.network-topology-cleaning");
+        TOPOLOGY                   = i18n.get("Topology");
+        NETWORK_TOPOLOGY_CLEANING  = i18n.get("NetworkTopologyCleaningPlugIn.network-topology-cleaning");
                                    
-        REFERENCE_LAYER            = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.reference-layer");
-        REFERENCE_LAYER_TOOLTIP    = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.reference-layer-tooltip");
-        LAYER_TO_SNAP              = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.layer-to-snap");
-        LAYER_TO_SNAP_TOOLTIP      = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.layer-to-snap-tooltip");
-        MISMATCHES                 = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.mismatches");
-        FIXED                      = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.fixed");
+        REFERENCE_LAYER            = i18n.get("NetworkTopologyCleaningPlugIn.reference-layer");
+        REFERENCE_LAYER_TOOLTIP    = i18n.get("NetworkTopologyCleaningPlugIn.reference-layer-tooltip");
+        LAYER_TO_SNAP              = i18n.get("NetworkTopologyCleaningPlugIn.layer-to-snap");
+        LAYER_TO_SNAP_TOOLTIP      = i18n.get("NetworkTopologyCleaningPlugIn.layer-to-snap-tooltip");
+        MISMATCHES                 = i18n.get("NetworkTopologyCleaningPlugIn.mismatches");
+        FIXED                      = i18n.get("NetworkTopologyCleaningPlugIn.fixed");
                                    
-        TOLERANCE                  = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.tolerance");
-        TOLERANCE_TOOLTIP          = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.tolerance-tooltip");
+        TOLERANCE                  = i18n.get("NetworkTopologyCleaningPlugIn.tolerance");
+        TOLERANCE_TOOLTIP          = i18n.get("NetworkTopologyCleaningPlugIn.tolerance-tooltip");
                                    
-        ADVANCED_OPTIONS           = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.advanced-options");
-        DEFAULT_ADVANCED_OPTIONS   = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.default-advanced-options");
+        ADVANCED_OPTIONS           = i18n.get("NetworkTopologyCleaningPlugIn.advanced-options");
+        DEFAULT_ADVANCED_OPTIONS   = i18n.get("NetworkTopologyCleaningPlugIn.default-advanced-options");
         
-        NODE3_TOL                  = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.node3-tol");
-        NODE3_TOL_TOOLTIP          = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.node3-tol-tooltip");
+        NODE3_TOL                  = i18n.get("NetworkTopologyCleaningPlugIn.node3-tol");
+        NODE3_TOL_TOOLTIP          = i18n.get("NetworkTopologyCleaningPlugIn.node3-tol-tooltip");
 
-        ANGLE_TOL                  = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.angle-tol");
-        ANGLE_TOL_TOOLTIP          = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.angle-tol-tooltip");
+        ANGLE_TOL                  = i18n.get("NetworkTopologyCleaningPlugIn.angle-tol");
+        ANGLE_TOL_TOOLTIP          = i18n.get("NetworkTopologyCleaningPlugIn.angle-tol-tooltip");
                                    
-        DETECTION                  = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.detection");
-        DETECTION_TOOLTIP          = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.detection-tooltip");
-        CORRECTION                 = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.layer1-nodes-moveable");
-        CORRECTION_TOOLTIP         = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.layer1-nodes-moveable-tooltip");
-        REFERENCE_EDITABLE         = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.layer2-geom-editable");
-        REFERENCE_EDITABLE_TOOLTIP = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.layer2-geom-editable-tooltip");
+        DETECTION                  = i18n.get("NetworkTopologyCleaningPlugIn.detection");
+        DETECTION_TOOLTIP          = i18n.get("NetworkTopologyCleaningPlugIn.detection-tooltip");
+        CORRECTION                 = i18n.get("NetworkTopologyCleaningPlugIn.layer1-nodes-moveable");
+        CORRECTION_TOOLTIP         = i18n.get("NetworkTopologyCleaningPlugIn.layer1-nodes-moveable-tooltip");
+        REFERENCE_EDITABLE         = i18n.get("NetworkTopologyCleaningPlugIn.layer2-geom-editable");
+        REFERENCE_EDITABLE_TOOLTIP = i18n.get("NetworkTopologyCleaningPlugIn.layer2-geom-editable-tooltip");
         
-        SNAP_MODE                  = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.snap-mode");
-        SNAP_TO_NODE               = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.snap-to-node");
-        SNAP_TO_VERTEX             = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.snap-to-vertex");
-        SNAP_TO_SEGMENT            = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.snap-to-segment");
-        NOT_SNAPPED                = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.not-snapped");
-        ROTATION                   = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.rotation");
+        SNAP_MODE                  = i18n.get("NetworkTopologyCleaningPlugIn.snap-mode");
+        SNAP_TO_NODE               = i18n.get("NetworkTopologyCleaningPlugIn.snap-to-node");
+        SNAP_TO_VERTEX             = i18n.get("NetworkTopologyCleaningPlugIn.snap-to-vertex");
+        SNAP_TO_SEGMENT            = i18n.get("NetworkTopologyCleaningPlugIn.snap-to-segment");
+        NOT_SNAPPED                = i18n.get("NetworkTopologyCleaningPlugIn.not-snapped");
+        ROTATION                   = i18n.get("NetworkTopologyCleaningPlugIn.rotation");
         
-        ATTRIBUTE_EQUALITY         = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.attribute-equality-option");
-        ATTRIBUTE_EQUALITY_TOOLTIP = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.attribute-equality-tooltip");
-        REFERENCE_ATTRIBUTE        = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.reference-layer-attribute");
-        SNAPPING_ATTRIBUTE         = I18NPlug.getI18N("NetworkTopologyCleaningPlugIn.snapping-layer-attribute");
+        ATTRIBUTE_EQUALITY         = i18n.get("NetworkTopologyCleaningPlugIn.attribute-equality-option");
+        ATTRIBUTE_EQUALITY_TOOLTIP = i18n.get("NetworkTopologyCleaningPlugIn.attribute-equality-tooltip");
+        REFERENCE_ATTRIBUTE        = i18n.get("NetworkTopologyCleaningPlugIn.reference-layer-attribute");
+        SNAPPING_ATTRIBUTE         = i18n.get("NetworkTopologyCleaningPlugIn.snapping-layer-attribute");
         
-        context.getFeatureInstaller().addMainMenuPlugin(
-          this, new String[]{MenuNames.PLUGINS, TOPOLOGY},
-          NETWORK_TOPOLOGY_CLEANING + "...",
-          false, null, new MultiEnableCheck()
-          .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
-          .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
+        context.getFeatureInstaller().addMainMenuPlugin(this,
+            new String[]{MenuNames.PLUGINS, TOPOLOGY},
+            getName() + "...", false, null,
+            new MultiEnableCheck()
+                .add(context.getCheckFactory().createTaskWindowMustBeActiveCheck())
+                .add(context.getCheckFactory().createAtLeastNLayersMustExistCheck(1)));
     }
     
     public boolean execute(PlugInContext context) {
