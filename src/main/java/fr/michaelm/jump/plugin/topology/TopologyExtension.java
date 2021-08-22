@@ -31,6 +31,7 @@ import com.vividsolutions.jump.workbench.plugin.Extension;
 import com.vividsolutions.jump.workbench.plugin.PlugInContext;
 
 // History
+// 2.0.0 (2021-08-22) : simple version number alignment with OpenJUMP's 2.0.0
 // 1.1.0 (2021-08-08) : refactoring for new I18N management
 // 1.0.0 (2021-04-03) : clean, generify and refactor for OpenJUMP2
 // 0.9.3 (2018-09-12) : fix a bug in CoverageCleaner
