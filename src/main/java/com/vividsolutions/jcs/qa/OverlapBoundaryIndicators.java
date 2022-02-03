@@ -76,7 +76,7 @@ public class OverlapBoundaryIndicators {
     Geometry overlapBdyLines = LineStringExtracter.getGeometry(overlapBdy);
 
     Geometry indAll;
-    if (intersectLines != null) {
+    if (intersectLines != null && !intersectLines.isEmpty()) {
       indAll = EnhancedPrecisionOp.difference(overlapBdyLines, intersectLines);
     }
     else {
@@ -130,6 +130,7 @@ public class OverlapBoundaryIndicators {
         // create indicator showing size of maximum overlap
         // assert: ind0 and ind are not null
         DiscreteHausdorffDistance hDist = new DiscreteHausdorffDistance(ob0, ob1);
+        hDist.distance();
         Geometry overlapSizeInd = factory.createLineString(hDist.getCoordinates());
         overlapSizeIndicators.add(overlapSizeInd);
       }
