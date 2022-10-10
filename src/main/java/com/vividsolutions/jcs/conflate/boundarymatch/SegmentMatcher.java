@@ -77,8 +77,8 @@ public class SegmentMatcher {
      * (LineSegment.angle returns an angle in the range [-PI, PI]
      */
     public static double angleDiff(LineSegment seg0, LineSegment seg1) {
-        double a0 = normalizedAngle(seg0.angle());
-        double a1 = normalizedAngle(seg1.angle());
+        double a0 = normalizedAngle(segmentAngleFast(seg0));
+        double a1 = normalizedAngle(segmentAngleFast(seg1));
         double delta = Math.min(normalizedAngle(a0-a1), normalizedAngle(a1-a0));
         return delta;
     }
@@ -190,5 +190,31 @@ public class SegmentMatcher {
         if (pos0 <= 0.0 && pos1 <= 0.0) return false;
         return true;
     }
+    
+	private static double segmentAngleFast(LineSegment l) {
+		return atan2Quick(l.p1.y - l.p0.y, l.p1.x - l.p0.x);
+	}
+
+	private static double atan2Quick(final double y, final double x) {
+		final double THREE_QRTR_PI = Math.PI * 0.75;
+		final double QRTR_PI = Math.PI * 0.25;
+
+		double r, angle;
+		final double abs_y = Math.abs(y) + 1e-10f; // kludge to prevent 0/0 condition
+
+		if (x < 0.0f) {
+			r = (x + abs_y) / (abs_y - x); // (3)
+			angle = THREE_QRTR_PI; // (4)
+		} else {
+			r = (x - abs_y) / (x + abs_y); // (1)
+			angle = QRTR_PI; // (2)
+		}
+		angle += (0.1963f * r * r - 0.9817f) * r; // (2 | 4)
+		if (y < 0.0f) {
+			return (-angle); // negate if in quad III or IV
+		} else {
+			return (angle);
+		}
+	}
 
 }
