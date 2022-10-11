@@ -123,8 +123,8 @@ public class Coverage {
                 // don't update geometry if it's not valid
 //                Debug.println("    adjusted geometry for : " + cgf.getFeature().getID() + " " +
 //                    ((g==null)?"g=null   ":"g!=null   ") + (g.isValid()?"g.isValid()":"!g.isValid()"));
-                Feature f = cgf.getFeature();
-//                Feature f = originalFeat.clone(false);
+                Feature originalFeat = cgf.getFeature();
+                Feature f = originalFeat.clone(false);
                 f.setGeometry(g);
                 adjustedFC.add(f);
                 // record this feature as an update to the original
