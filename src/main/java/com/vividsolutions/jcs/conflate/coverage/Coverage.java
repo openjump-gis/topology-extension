@@ -121,10 +121,10 @@ public class Coverage {
                 // polygon into a MultiPolygon (only if it is noded)
                 if (!g.isValid()) g = g.buffer(0);
                 // don't update geometry if it's not valid
-                Debug.println("    adjusted geometry for : " + cgf.getFeature().getID() + " " +
-                    ((g==null)?"g=null   ":"g!=null   ") + (g.isValid()?"g.isValid()":"!g.isValid()"));
-                Feature originalFeat = cgf.getFeature();
-                Feature f = originalFeat.clone(false);
+//                Debug.println("    adjusted geometry for : " + cgf.getFeature().getID() + " " +
+//                    ((g==null)?"g=null   ":"g!=null   ") + (g.isValid()?"g.isValid()":"!g.isValid()"));
+                Feature f = cgf.getFeature();
+//                Feature f = originalFeat.clone(false);
                 f.setGeometry(g);
                 adjustedFC.add(f);
                 // record this feature as an update to the original

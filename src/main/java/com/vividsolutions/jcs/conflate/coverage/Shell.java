@@ -150,11 +150,11 @@ public class Shell extends GeometryComponent {
     public boolean match(Shell shell, SegmentMatcher segmentMatcher,
                                       SegmentIndex matchedSegmentIndex) {
         if (segmentMatcher == null) {
-            Debug.println("Segment matcher should not be null !");
+//            Debug.println("Segment matcher should not be null !");
             return false;
         }
         else if (matchedSegmentIndex == null) {
-            Debug.println("matchedSegmentIndex should not be null !");
+//            Debug.println("matchedSegmentIndex should not be null !");
             return false;
         }
         // this method might cause the coordinates to change, so make sure they are recomputed
@@ -224,7 +224,7 @@ public class Shell extends GeometryComponent {
         // already computed
         if (adjustedCoord != null) return;
         CoordinateList coordList = new CoordinateList();
-        Debug.println("      Adjust coordinates for " + featureID + "/" + shellIndex);
+//        Debug.println("      Adjust coordinates for " + featureID + "/" + shellIndex);
         // For each segment of this Shell
         for (int i = 0; i < segments.length; i++) {
             Coordinate pt = getAdjustedCoordinate(i);
@@ -234,13 +234,13 @@ public class Shell extends GeometryComponent {
             }
             // add first coordinate
             coordList.add(pt, false);
-            if (!pt.equals(uniqueCoord[i])) {
-                Debug.println("        " + i + " : move " + uniqueCoord[i] + " -> " + pt);
-            }
+//            if (!pt.equals(uniqueCoord[i])) {
+//                Debug.println("        " + i + " : move " + uniqueCoord[i] + " -> " + pt);
+//            }
             if (segments[i] != null) {
                 // add inserted coordinates
                 coordList.addAll(segments[i].getInsertedCoordinates(interpolate_z, scale), false);
-                Debug.println("        " + i + " : insert " + segments[i].getInsertedCoordinates(interpolate_z, scale));
+//                Debug.println("        " + i + " : insert " + segments[i].getInsertedCoordinates(interpolate_z, scale));
             } 
         }
         coordList.closeRing();

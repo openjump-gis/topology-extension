@@ -384,10 +384,10 @@ public class InternalMatchedSegmentFinder {
             if (zeroLength) continue;
             
             boolean isMatch = segmentMatcher.isMatch(fs, candidateFS);
-            Debug.println("       -> " + candidateFS);
+//            Debug.println("       -> " + candidateFS);
             if (isMatch && !isEqual && !zeroLength) {
                 hasMatch = true;
-                Debug.println(" MATCH !");
+//                Debug.println(" MATCH !");
                 //System.out.println("match : " + fs.getFeature().getID()+"|"+fs.toString() + " - " + candidateFS.getFeature().getID()+"|"+candidateFS.toString());
                 //System.out.println("   checkMatch=true for " + fs + " / " + candidateFS);
                 // save matched segments for future processing
@@ -402,7 +402,7 @@ public class InternalMatchedSegmentFinder {
                     }
                 }
             }
-            else Debug.println("");
+//            else Debug.println("");
         }
         return hasMatch;
     }
