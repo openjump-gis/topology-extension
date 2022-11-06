@@ -55,7 +55,15 @@ public class SegmentMatcher {
 
 
     //public static final double ANGLE_TOLERANCE = Math.PI / 8;   // 22.5 degrees
-    public static final double PI2 = 2.0 * Math.PI;
+    final static double TWO_PI = 2.0 * Math.PI;
+    final static double HALF_PI = Math.PI / 2.0;
+    final static double QRTR_PI = Math.PI * 0.25;
+    //final static double THREE_QRTR_PI = Math.PI * 0.75;
+    private static final double A = 0.0776509570923569;
+    private static final double B = -0.287434475393028;
+    private static final double C = (QRTR_PI - A - B);
+
+
 
     /**
      * Computes an equivalent angle in the range 0 <= ang < 2*PI
@@ -65,8 +73,8 @@ public class SegmentMatcher {
      * @return the normalized equivalent angle
      */
     public static double normalizedAngle(double angle) {
-        if (angle < 0.0) return normalizedAngle(angle + PI2);
-        else if (angle >= PI2) return normalizedAngle(angle - PI2);
+        if (angle < 0.0) return normalizedAngle(angle + TWO_PI);
+        else if (angle >= TWO_PI) return normalizedAngle(angle - TWO_PI);
         else return angle;
     }
 
@@ -79,8 +87,7 @@ public class SegmentMatcher {
     public static double angleDiff(LineSegment seg0, LineSegment seg1) {
         double a0 = normalizedAngle(segmentAngleFast(seg0));
         double a1 = normalizedAngle(segmentAngleFast(seg1));
-        double delta = Math.min(normalizedAngle(a0-a1), normalizedAngle(a1-a0));
-        return delta;
+        return Math.min(normalizedAngle(a0-a1), normalizedAngle(a1-a0));
     }
 
     // temp storage for point args
@@ -142,20 +149,17 @@ public class SegmentMatcher {
         switch (segmentOrientation) {
             case OPPOSITE_ORIENTATION:
                 if (dAngleInv > angleToleranceRad) {
-                    isMatch = false;
-                    return isMatch;
+                    return false;
                 }
                 break;
             case SAME_ORIENTATION:
                 if (dAngle > angleToleranceRad) {
-                    isMatch = false;
-                    return isMatch;
+                    return false;
                 }
                 break;
             case EITHER_ORIENTATION:
                 if (dAngle > angleToleranceRad && dAngleInv > angleToleranceRad) {
-                    isMatch = false;
-                    return isMatch;
+                    return false;
                 }
                 break;
         }
@@ -163,8 +167,7 @@ public class SegmentMatcher {
         LineSegment projSeg1 = seg2.project(seg1);
         LineSegment projSeg2 = seg1.project(seg2);
         if (projSeg1 == null || projSeg2 == null) {
-            isMatch = false;
-            return isMatch;
+            return false;
         }
 
         if (new DiscreteHausdorffDistance(projSeg1.toGeometry(FACTORY), projSeg2.toGeometry(FACTORY)).distance() > distanceTolerance) {
@@ -191,30 +194,41 @@ public class SegmentMatcher {
         return true;
     }
     
-	private static double segmentAngleFast(LineSegment l) {
-		return atan2Quick(l.p1.y - l.p0.y, l.p1.x - l.p0.x);
-	}
+	  private static double segmentAngleFast(LineSegment l) {
+		    return fastAtan2(l.p1.y - l.p0.y, l.p1.x - l.p0.x);
+	  }
 
-	private static double atan2Quick(final double y, final double x) {
-		final double THREE_QRTR_PI = Math.PI * 0.75;
-		final double QRTR_PI = Math.PI * 0.25;
+    /**
+     * Maximum absolute error of ~0.00085 rad (~0.049º).
+     */
+    private static double fastAccurateAtan(final double x) {
+        final double xx = x * x;
+        return ((A * xx + B) * xx + C) * x;
+    }
 
-		double r, angle;
-		final double abs_y = Math.abs(y) + 1e-10f; // kludge to prevent 0/0 condition
-
-		if (x < 0.0f) {
-			r = (x + abs_y) / (abs_y - x); // (3)
-			angle = THREE_QRTR_PI; // (4)
-		} else {
-			r = (x - abs_y) / (x + abs_y); // (1)
-			angle = QRTR_PI; // (2)
-		}
-		angle += (0.1963f * r * r - 0.9817f) * r; // (2 | 4)
-		if (y < 0.0f) {
-			return (-angle); // negate if in quad III or IV
-		} else {
-			return (angle);
-		}
-	}
+    /**
+     * Maximum absolute error of ~0.00085 rad (~0.049º).
+     * Computation time is about 15% of that of java Math.atan2.
+     *
+     * Note : unlike java Math.atan2 which returns 0.0,
+     * fastAtan2(0.0, 0.0) returns NaN
+     *
+     * @return Angle from x axis positive side to (x,y) position, in radians, in
+     *         [-PI,PI].
+     */
+    public static double fastAtan2(final double y, final double x) {
+        // Adapted from https://www.dsprelated.com/showarticle/1052.php
+        final double ay = Math.abs(y), ax = Math.abs(x);
+        final boolean invert = ay > ax;
+        final double z = invert ? ax / ay : ay / ax; // [0,1]
+        double th = fastAccurateAtan(z); // [0,π/4]
+        if (invert) {
+            th = HALF_PI - th; // [0,π/2]
+        }
+        if (x < 0) {
+            th = Math.PI - th; // [0,π]
+        }
+        return Math.copySign(th, y); // [-π,π]
+    }
 
 }
