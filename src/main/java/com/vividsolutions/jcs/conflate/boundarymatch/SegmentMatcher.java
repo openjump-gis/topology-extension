@@ -142,6 +142,16 @@ public class SegmentMatcher {
      */
     public boolean isMatch(LineSegment seg1, LineSegment seg2) {
         boolean isMatch = true;
+        LineSegment projSeg1 = seg2.project(seg1);
+        LineSegment projSeg2 = seg1.project(seg2);
+        if (projSeg1 == null || projSeg2 == null) {
+        	return false;
+        }
+        
+        double hDiff = hausdorffDistance(projSeg1, projSeg2);
+        if (hDiff > distanceTolerance) {
+        	return false;
+        }
         double dAngle = angleDiff(seg1, seg2);
         double dAngleInv = angleDiff(new LineSegment(seg1.p1, seg1.p0), seg2);
         switch (segmentOrientation) {
@@ -162,17 +172,6 @@ public class SegmentMatcher {
                 break;
         }
 
-        LineSegment projSeg1 = seg2.project(seg1);
-        LineSegment projSeg2 = seg1.project(seg2);
-        if (projSeg1 == null || projSeg2 == null) {
-            return false;
-        }
-
-//        double hDiff = new DiscreteHausdorffDistance(projSeg1.toGeometry(FACTORY), projSeg2.toGeometry(FACTORY)).distance();
-        double hDiff = hausdorffDistance(projSeg1, projSeg2);
-        if (hDiff > distanceTolerance) {
-            isMatch = false;
-        }
         return isMatch;
     }
     
