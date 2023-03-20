@@ -35,8 +35,8 @@ package com.vividsolutions.jcs.conflate.coverage;
 import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
 import com.vividsolutions.jcs.qa.FeatureSegment;
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.util.Debug;
-
+import org.locationtech.jts.geomgraph.index.MonotoneChain;
+import org.locationtech.jts.index.strtree.STRtree;
 import java.util.Set;
 
 /**
@@ -64,7 +64,7 @@ public class Shell extends GeometryComponent {
     // index of this shell in the feature (exterior shell is 0, holes are 1, 2, 3...)
     private final int shellIndex;
     // this marker is set to true if this Shell Segments have been marked
-    // with marked with isInIndex marker (to know if they are in SegmentIndex). 
+    // with marked with isInIndex marker (to know if they are in SegmentIndex).
     private boolean isInSegmentIndexInitialized = false;
 
     public Shell(VertexMap vertexMap, int featureID, int shellIndex) {
@@ -72,11 +72,11 @@ public class Shell extends GeometryComponent {
         this.shellIndex = shellIndex;
         this.featureID = featureID;
     }
-    
+
     public int getFeatureID() {
         return featureID;
     }
-    
+
     public int getShellIndex() {
         return shellIndex;
     }
@@ -89,6 +89,8 @@ public class Shell extends GeometryComponent {
         return ring;
     }
 
+    STRtree tree = new STRtree();
+
     public void initialize(LinearRing ring, Set<Coordinate> adjustableCoords) {
         this.ring = ring;
         uniqueCoord = CoordinateArrays.removeRepeatedPoints(ring.getCoordinates());
@@ -97,15 +99,22 @@ public class Shell extends GeometryComponent {
         for (int i = 0 ; i < uniqueCoord.length ; i++) {
             createVertex(i, adjustableCoords);
         }
-        for (int i = 0 ; i < uniqueCoord.length-1 ; i++) {
-            if (isVertex[i] || isVertex[i+1]) segments[i] = createSegment(i);
+        for (int i = 0; i < uniqueCoord.length - 1; i++) {
+            if (isVertex[i] || isVertex[i + 1]) {
+                segments[i] = createSegment(i);
+            }
         }
-    }
-    
-    //public boolean isIsInIndexInitialized() {
-    //    return isInSegmentIndexInitialized;
-    //}
-    
+
+		for (int i = 0; i < segments.length; i++) {
+			if (this.segments[i] != null) {
+				Envelope env = new Envelope(segments[i].getLineSegment().p0.x, segments[i].getLineSegment().p1.x,
+						segments[i].getLineSegment().p0.y, segments[i].getLineSegment().p1.y);
+				tree.insert(env, segments[i]);
+			}
+		}
+		tree.build();
+	}
+
     public void inSegmentIndexInitialization(SegmentIndex index) {
         if (!isInSegmentIndexInitialized) {
             for (int i = 0; i < segments.length; i++) {
@@ -142,7 +151,7 @@ public class Shell extends GeometryComponent {
     }
 
     // [2013-01-26] segmentIndex contains segments with original coordinates
-    // 
+    //
     private boolean isInIndex(SegmentIndex segmentIndex, int i) {
         return segmentIndex.contains(new FeatureSegment(null, uniqueCoord[i], uniqueCoord[i + 1], -1, -1));
     }
@@ -161,51 +170,42 @@ public class Shell extends GeometryComponent {
         adjustedCoord = null;
         boolean isAdjusted = false;
 
-
-        // Only matched segments are considered for adjustment
-        // (Non-matched ones either are already paired,
-        // or have no match candidates)
-
-        // this is O(n^2), which can be a problem for large polygons
-        // (MD - although much better now with the short-circuiting of unmatched segs)
+ 
         this.inSegmentIndexInitialization(matchedSegmentIndex);
         shell.inSegmentIndexInitialization(matchedSegmentIndex);
-        for (int i = 0; i < segments.length; i++) {
-            if (segments[i] == null) continue;
-            if (!segments[i].isInIndex()) continue;
-            Envelope env = new Envelope(segments[i].getLineSegment().p0.x, segments[i].getLineSegment().p1.x, segments[i].getLineSegment().p0.y, segments[i].getLineSegment().p1.y);
-            env.expandBy(2*segmentMatcher.getDistanceTolerance());
-            for (int j = 0; j < shell.segments.length; j++) {
-                if (shell.segments[j] == null) continue;
-                if (!shell.segments[j].isInIndex()) continue;
 
-                Segment seg0 = getSegment(i);
-                Segment seg1 = shell.getSegment(j);
+		/*
+		 * n*log(n) matching. JTS monotone chain intersection would probably be even
+		 * faster, but we need to intersect based on expanded envelope (to account for
+		 * distance tolerance).
+		 */
+		for (int j = 0; j < shell.segments.length; j++) {
+			if (shell.segments[j] == null || !shell.segments[j].isInIndex()) {
+				continue;
+			}
+			
+			final Segment seg1 = shell.segments[j];
+			final Envelope env = new Envelope(seg1.getLineSegment().p0.x, seg1.getLineSegment().p1.x, seg1.getLineSegment().p0.y,
+					seg1.getLineSegment().p1.y);
+			env.expandBy(2 * segmentMatcher.getDistanceTolerance());
 
-                // Inefficient - we already know which segments match
-                // Also, could this be done symmetrically?
-                // eg the segment added to both segments at the same time?
-                LineSegment lineSeg0 = seg0.getLineSegment();
-                LineSegment lineSeg1 = seg1.getLineSegment();
-                // heuristic to speed up match checking
-                //if (lineSeg0.distance(lineSeg1) > 2.0 * segmentMatcher.getDistanceTolerance()) {
-                //    Debug.println("out of tolerance");
-                //    continue;
-                //}
-                
-                boolean isMatch = segmentMatcher.isMatch(lineSeg0, lineSeg1);
-                boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
-                if (isMatch && !isTopoEqual) {
-                    //Debug.println("MATCH !");
-                    isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());
-                } 
-                else {
-                    //Debug.println("NOT MATCH");
-                }
-            }
-            
-        }
-        //System.out.println("         isadjusted:"+isAdjusted);
+			for (Object seg : tree.query(env)) {
+				Segment seg0 = (Segment) seg;
+
+				// Inefficient - we already know which segments match
+				// Also, could this be done symmetrically?
+				// eg the segment added to both segments at the same time?
+				LineSegment lineSeg0 = seg0.getLineSegment();
+				LineSegment lineSeg1 = seg1.getLineSegment();
+
+				boolean isMatch = segmentMatcher.isMatch(lineSeg0, lineSeg1);
+				boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
+				if (isMatch && !isTopoEqual) {
+					isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());
+				}
+			}
+		}
+
         return isAdjusted;
     }
 
@@ -241,7 +241,7 @@ public class Shell extends GeometryComponent {
                 // add inserted coordinates
                 coordList.addAll(segments[i].getInsertedCoordinates(interpolate_z, scale), false);
 //                Debug.println("        " + i + " : insert " + segments[i].getInsertedCoordinates(interpolate_z, scale));
-            } 
+            }
         }
         coordList.closeRing();
         // open the ring so that following cleaning operations can use the
@@ -253,13 +253,13 @@ public class Shell extends GeometryComponent {
         adjustedCoord = noRepeatCoordList.toCoordinateArray();
     }
 
-    // Get the new adjusted coordinate for point i 
+    // Get the new adjusted coordinate for point i
     private Coordinate getAdjustedCoordinate(int i) {
         if (segments[i] != null) {
             Coordinate c = segments[i].getVertex(0).getCoordinate();
             //[mmichaud 2013-01-26] improvement : if the new position of the
             // vertex has itself been adjusted, return the new new position
-            // TODO : may it enter an infinite loop ? 
+            // TODO : may it enter an infinite loop ?
             if (!vertexMap.contains(c)) return c;
             Vertex v = vertexMap.get(c);
             return v.getCoordinate();
@@ -293,7 +293,7 @@ public class Shell extends GeometryComponent {
         }
         return coordList;
     }
-    
+
     /**
     * Remove micro-loops
     * (e.g. a pattern of Coordinates of the form "a-b-c-a" with a-b, b-c and c-a
@@ -332,15 +332,15 @@ public class Shell extends GeometryComponent {
         }
         return false;
     }
-    
+
     public boolean equals(Object o) {
         if (o instanceof Shell) {
             Shell other = (Shell)o;
             return featureID == other.getFeatureID() && shellIndex == other.getShellIndex();
-        } 
+        }
         else return false;
     }
-    
+
     public int hashCode() {
         return featureID << 15 + shellIndex;
     }
