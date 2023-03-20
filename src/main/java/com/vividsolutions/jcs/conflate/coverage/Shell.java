@@ -35,7 +35,6 @@ package com.vividsolutions.jcs.conflate.coverage;
 import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
 import com.vividsolutions.jcs.qa.FeatureSegment;
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.geomgraph.index.MonotoneChain;
 import org.locationtech.jts.index.strtree.STRtree;
 import java.util.Set;
 
@@ -199,9 +198,11 @@ public class Shell extends GeometryComponent {
 				LineSegment lineSeg1 = seg1.getLineSegment();
 
 				boolean isMatch = segmentMatcher.isMatch(lineSeg0, lineSeg1);
-				boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
-				if (isMatch && !isTopoEqual) {
-					isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());
+				if (isMatch) {
+					boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
+					if (!isTopoEqual) {
+						isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());						
+					}
 				}
 			}
 		}
