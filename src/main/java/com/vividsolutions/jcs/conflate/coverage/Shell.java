@@ -36,6 +36,8 @@ import com.vividsolutions.jcs.conflate.boundarymatch.SegmentMatcher;
 import com.vividsolutions.jcs.qa.FeatureSegment;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
+
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -65,11 +67,13 @@ public class Shell extends GeometryComponent {
     // this marker is set to true if this Shell Segments have been marked
     // with marked with isInIndex marker (to know if they are in SegmentIndex).
     private boolean isInSegmentIndexInitialized = false;
+    private final Set<Shell> intersectedHistory;
 
     public Shell(VertexMap vertexMap, int featureID, int shellIndex) {
         this.vertexMap = vertexMap;
         this.shellIndex = shellIndex;
         this.featureID = featureID;
+        this.intersectedHistory = new HashSet<>();
     }
 
     public int getFeatureID() {
@@ -165,6 +169,15 @@ public class Shell extends GeometryComponent {
 //            Debug.println("matchedSegmentIndex should not be null !");
             return false;
         }
+        
+        if (intersectedHistory.contains(shell)) {
+        	// intersected symmetrically before, so skip
+        	return true;
+        }
+        
+        intersectedHistory.add(shell);
+        shell.intersectedHistory.add(this);
+        
         // this method might cause the coordinates to change, so make sure they are recomputed
         adjustedCoord = null;
         boolean isAdjusted = false;
@@ -191,9 +204,6 @@ public class Shell extends GeometryComponent {
 			for (Object seg : tree.query(env)) {
 				Segment seg0 = (Segment) seg;
 
-				// Inefficient - we already know which segments match
-				// Also, could this be done symmetrically?
-				// eg the segment added to both segments at the same time?
 				LineSegment lineSeg0 = seg0.getLineSegment();
 				LineSegment lineSeg1 = seg1.getLineSegment();
 
@@ -201,7 +211,9 @@ public class Shell extends GeometryComponent {
 				if (isMatch) {
 					boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
 					if (!isTopoEqual) {
+						// add match to both segments at the same time
 						isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());						
+						seg1.addMatchedSegment(seg0, segmentMatcher.getDistanceTolerance());						
 					}
 				}
 			}
