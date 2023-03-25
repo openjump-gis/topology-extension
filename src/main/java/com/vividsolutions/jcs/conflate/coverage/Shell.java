@@ -108,15 +108,15 @@ public class Shell extends GeometryComponent {
             }
         }
 
-		for (int i = 0; i < segments.length; i++) {
-			if (this.segments[i] != null) {
-				Envelope env = new Envelope(segments[i].getLineSegment().p0.x, segments[i].getLineSegment().p1.x,
-						segments[i].getLineSegment().p0.y, segments[i].getLineSegment().p1.y);
-				tree.insert(env, segments[i]);
-			}
-		}
-		tree.build();
-	}
+        for (int i = 0; i < segments.length; i++) {
+            if (segments[i] != null) {
+                Envelope env = new Envelope(segments[i].getLineSegment().p0.x, segments[i].getLineSegment().p1.x,
+                    segments[i].getLineSegment().p0.y, segments[i].getLineSegment().p1.y);
+                tree.insert(env, segments[i]);
+            }
+        }
+        tree.build();
+    }
 
     public void inSegmentIndexInitialization(SegmentIndex index) {
         if (!isInSegmentIndexInitialized) {
@@ -171,8 +171,8 @@ public class Shell extends GeometryComponent {
         }
         
         if (intersectedHistory.contains(shell)) {
-        	// intersected symmetrically before, so skip
-        	return true;
+            // intersected symmetrically before, so skip
+            return true;
         }
         
         intersectedHistory.add(shell);
@@ -186,38 +186,37 @@ public class Shell extends GeometryComponent {
         this.inSegmentIndexInitialization(matchedSegmentIndex);
         shell.inSegmentIndexInitialization(matchedSegmentIndex);
 
-		/*
-		 * n*log(n) matching. JTS monotone chain intersection would probably be even
-		 * faster, but we need to intersect based on expanded envelope (to account for
-		 * distance tolerance).
-		 */
-		for (int j = 0; j < shell.segments.length; j++) {
-			if (shell.segments[j] == null || !shell.segments[j].isInIndex()) {
-				continue;
-			}
-			
-			final Segment seg1 = shell.segments[j];
-			final Envelope env = new Envelope(seg1.getLineSegment().p0.x, seg1.getLineSegment().p1.x, seg1.getLineSegment().p0.y,
-					seg1.getLineSegment().p1.y);
-			env.expandBy(2 * segmentMatcher.getDistanceTolerance());
+        /*
+         * n*log(n) matching. JTS monotone chain intersection would probably be even
+         * faster, but we need to intersect based on expanded envelope (to account for
+         * distance tolerance).
+         */
+        for (int j = 0; j < shell.segments.length; j++) {
+            if (shell.segments[j] == null || !shell.segments[j].isInIndex()) {
+                continue;
+            }
+            final Segment seg1 = shell.segments[j];
+            final Envelope env = new Envelope(seg1.getLineSegment().p0.x, seg1.getLineSegment().p1.x,
+                seg1.getLineSegment().p0.y, seg1.getLineSegment().p1.y);
+            env.expandBy(2 * segmentMatcher.getDistanceTolerance());
 
-			for (Object seg : tree.query(env)) {
-				Segment seg0 = (Segment) seg;
+            for (Object seg : tree.query(env)) {
+                Segment seg0 = (Segment) seg;
 
-				LineSegment lineSeg0 = seg0.getLineSegment();
-				LineSegment lineSeg1 = seg1.getLineSegment();
+                LineSegment lineSeg0 = seg0.getLineSegment();
+                LineSegment lineSeg1 = seg1.getLineSegment();
 
-				boolean isMatch = segmentMatcher.isMatch(lineSeg0, lineSeg1);
-				if (isMatch) {
-					boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
-					if (!isTopoEqual) {
-						// add match to both segments at the same time
-						isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());						
-						seg1.addMatchedSegment(seg0, segmentMatcher.getDistanceTolerance());						
-					}
-				}
-			}
-		}
+                boolean isMatch = segmentMatcher.isMatch(lineSeg0, lineSeg1);
+                if (isMatch) {
+                    boolean isTopoEqual = lineSeg0.equalsTopo(lineSeg1);
+                    if (!isTopoEqual) {
+                        // add match to both segments at the same time
+                        isAdjusted |= seg0.addMatchedSegment(seg1, segmentMatcher.getDistanceTolerance());
+                        seg1.addMatchedSegment(seg0, segmentMatcher.getDistanceTolerance());
+                    }
+                }
+            }
+        }
 
         return isAdjusted;
     }
