@@ -32,7 +32,6 @@
 
 package com.vividsolutions.jcs.conflate.boundarymatch;
 
-import org.locationtech.jts.algorithm.distance.DiscreteHausdorffDistance;
 import org.locationtech.jts.geom.*;
 import com.vividsolutions.jump.geom.*;
 
@@ -46,7 +45,6 @@ public class SegmentMatcher {
     public static final int SAME_ORIENTATION = 1;
     public static final int OPPOSITE_ORIENTATION = 2;
     public static final int EITHER_ORIENTATION = 3;
-    private static final GeometryFactory FACTORY = new GeometryFactory();
 
     public static boolean isCloseTo(Coordinate coord, LineSegment seg, double tolerance) {
         return coord.distance(seg.getCoordinate(0)) < tolerance ||
@@ -144,6 +142,16 @@ public class SegmentMatcher {
      */
     public boolean isMatch(LineSegment seg1, LineSegment seg2) {
         boolean isMatch = true;
+        LineSegment projSeg1 = seg2.project(seg1);
+        LineSegment projSeg2 = seg1.project(seg2);
+        if (projSeg1 == null || projSeg2 == null) {
+        	return false;
+        }
+        
+        double hDiff = hausdorffDistance(projSeg1, projSeg2);
+        if (hDiff > distanceTolerance) {
+        	return false;
+        }
         double dAngle = angleDiff(seg1, seg2);
         double dAngleInv = angleDiff(new LineSegment(seg1.p1, seg1.p0), seg2);
         switch (segmentOrientation) {
@@ -164,18 +172,9 @@ public class SegmentMatcher {
                 break;
         }
 
-        LineSegment projSeg1 = seg2.project(seg1);
-        LineSegment projSeg2 = seg1.project(seg2);
-        if (projSeg1 == null || projSeg2 == null) {
-            return false;
-        }
-
-        if (new DiscreteHausdorffDistance(projSeg1.toGeometry(FACTORY), projSeg2.toGeometry(FACTORY)).distance() > distanceTolerance) {
-            isMatch = false;
-        }
         return isMatch;
     }
-
+    
     /**
      * Test whether there is an overlap between the segments in either direction.
      * A segment overlaps another if it projects onto the segment.
@@ -230,5 +229,15 @@ public class SegmentMatcher {
         }
         return Math.copySign(th, y); // [-π,π]
     }
+
+	private static double hausdorffDistance(final LineSegment s1, final LineSegment s2) {
+	    double maxDist1 = 0.0;
+	    double maxDist2 = 0.0;
+	    maxDist1 = Math.max(s1.distance(s2.p0), maxDist1);
+	    maxDist1 = Math.max(s1.distance(s2.p1), maxDist1);
+	    maxDist2 = Math.max(s2.distance(s1.p0), maxDist2);
+	    maxDist2 = Math.max(s2.distance(s1.p1), maxDist2);
+	    return Math.max(maxDist1, maxDist2);
+	}
 
 }
