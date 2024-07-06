@@ -429,11 +429,12 @@ public class NetworkTopologyCleaningPlugIn extends ThreadedBasePlugIn {
         // Returns true if this node is already snapped on a feature of fc 
         public boolean isSnapped(FeatureCollection fc) {
             List<Feature> candidates = fc.query(new Envelope(coord));
-            for (Feature feature : candidates) {
-                Geometry geom = feature.getGeometry();
-                // if this node comes from fc, you don't want to snapped the
-                // node on the feature it comes from : skip it 
-                if (geom.equals(feature.getGeometry())) continue;
+            for (Feature f : candidates) {
+                Geometry geom = f.getGeometry();
+                // if this node comes from fc, you don't want to snap the
+                // node on the feature it comes from : skip it
+                // 2024-07-06 : use equalsExact, much faster than equalsTopo
+                if (geom.equalsExact(feature.getGeometry())) continue;
                 for (Coordinate c : geom.getCoordinates()) {
                     if (coord.equals(c)) return true;
                 }
